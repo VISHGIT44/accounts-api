@@ -1,0 +1,16 @@
+{
+  "entityNumber": "373486",
+  "entityTypeCode": "PERS",
+  "drawAccounts": [
+    {
+      "accountNumber": "6013992755",
+      "drawAccountNumber": "6000334283",
+      "drawMethodCd": 1
+    },
+    {
+      "accountNumber": "6013992755",
+      "drawAccountNumber": "6005687653",
+      "drawMethodCd": 2
+    }
+  ]
+}

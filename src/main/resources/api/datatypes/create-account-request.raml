@@ -1,0 +1,33 @@
+#%RAML 1.0 DataType
+
+displayName: Create Account Request
+description: Create Account Request structure
+type: object
+properties:
+  bankOrganizationNumber: integer
+  branchOrganizationNumber: integer
+  currentMinorAccountTypeCode: 
+    type: string
+    pattern: "^[a-zA-Z0-9]*$"
+  majorAccountTypeCode: string
+  ownershipCode: string
+  deliveryMethodCode?: string
+  mailAddressUseCode?: string
+  isShareAccount?: boolean
+  persons:
+    type: array
+    items:
+      type: !include person.raml
+  userFields?: 
+    type: array
+    items:
+      type: object
+      properties:
+        code: string
+        value: string
+      
+examples:
+  createAccountRequest:  !include ../examples/create-account-request-example.raml
+        
+      
+  

@@ -1,0 +1,154 @@
+#%RAML 1.0 Library
+
+securitySchemes:
+  client-id-enforcement:
+    description: A custom security scheme based on Client Id and Client Secret headers for authenticating requests.
+    type: x-custom
+    describedBy:
+      headers:
+        client_id:
+          type: !include datatypes/clientIdType.raml
+          required: true
+          example: !include examples/clientIdExample.raml
+        client_secret:
+          type: !include datatypes/clientSecretType.raml
+          required: true
+          example: !include examples/clientSecretExample.raml
+         
+traits:
+
+  trackable:
+    headers:
+      X-Correlation-ID:
+        type: !include datatypes/correlationIdType.raml
+        required: true
+        example: !include examples/correlationIdExample.raml
+    responses:
+      200:
+        headers:
+          X-Correlation-ID:
+            type: !include  datatypes/correlationIdType.raml
+            required: true
+            example: !include examples/correlationIdExample.raml
+          X-Transaction-ID:
+            type: !include datatypes/transactionIdType.raml
+            required: false
+            example: !include examples/transactionIdExample.raml
+      201:
+        headers:
+          X-Correlation-ID:
+            type: !include  datatypes/correlationIdType.raml
+            required: true
+            example: !include examples/correlationIdExample.raml
+          X-Transaction-ID:
+            type: !include datatypes/transactionIdType.raml
+            required: false
+            example: !include examples/transactionIdExample.raml
+      400:
+        headers:
+          X-Correlation-ID:
+            type: !include  datatypes/correlationIdType.raml
+            required: true
+            example: !include examples/correlationIdExample.raml
+          X-Transaction-ID:
+            type: !include datatypes/transactionIdType.raml
+            required: false
+            example: !include examples/transactionIdExample.raml
+      401:
+        headers:
+          X-Correlation-ID:
+            type: !include  datatypes/correlationIdType.raml
+            required: true
+            example: !include examples/correlationIdExample.raml
+          X-Transaction-ID:
+            type: !include datatypes/transactionIdType.raml
+            required: false
+            example: !include examples/transactionIdExample.raml
+      403:
+        headers:
+          X-Correlation-ID:
+            type: !include  datatypes/correlationIdType.raml
+            required: true
+            example: !include examples/correlationIdExample.raml
+          X-Transaction-ID:
+            type: !include datatypes/transactionIdType.raml
+            required: false
+            example: !include examples/transactionIdExample.raml
+      404:
+        headers:
+          X-Correlation-ID:
+            type: !include  datatypes/correlationIdType.raml
+            required: true
+            example: !include examples/correlationIdExample.raml
+          X-Transaction-ID:
+            type: !include datatypes/transactionIdType.raml
+            required: false
+            example: !include examples/transactionIdExample.raml
+      405:
+        headers:
+          X-Correlation-ID:
+            type: !include  datatypes/correlationIdType.raml
+            required: true
+            example: !include examples/correlationIdExample.raml
+          X-Transaction-ID:
+            type: !include datatypes/transactionIdType.raml
+            required: false
+            example: !include examples/transactionIdExample.raml
+      500:
+        headers:
+          X-Correlation-ID:
+            type: !include  datatypes/correlationIdType.raml
+            required: true
+            example: !include examples/correlationIdExample.raml
+          X-Transaction-ID:
+            type: !include datatypes/transactionIdType.raml
+            required: false
+            example: !include examples/transactionIdExample.raml
+      503:
+        headers:
+          X-Correlation-ID:
+            type: !include  datatypes/correlationIdType.raml
+            required: true
+            example: !include examples/correlationIdExample.raml
+          X-Transaction-ID:
+            type: !include datatypes/transactionIdType.raml
+            required: false
+            example: !include examples/transactionIdExample.raml
+
+  defaultErrors:
+    responses:
+      400:
+        body:
+          application/json:
+            type:  !include datatypes/errorType.raml
+            example: !include examples/clientError400Example.raml 
+      401:
+        body:
+          application/json:
+            type:  !include datatypes/errorType.raml
+            example: !include examples/clientError401Example.raml
+      403:
+        body:
+          application/json:
+            type:  !include datatypes/errorType.raml
+            example: !include examples/clientError403Example.raml
+      404:
+        body:
+          application/json:
+            type:  !include datatypes/errorType.raml
+            example: !include examples/clientError404Example.raml
+      405:
+        body:
+          application/json:
+            type:  !include datatypes/errorType.raml
+            example: !include examples/clientError405Example.raml 
+      500:
+        body:
+          application/json:
+            type: !include datatypes/errorType.raml
+            example: !include examples/serverError500Example.raml
+      503:
+        body:
+          application/json:
+            type: !include datatypes/errorType.raml
+            example: !include examples/serverError503Example.raml

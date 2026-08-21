@@ -1,0 +1,73 @@
+{
+  "bankOrganizationNumber": 1,
+  "branchOrganizationNumber": 1,
+  "ownershipCode": "JO",
+  "persons": [
+    {
+      "personNumber": 777453,
+      "name": {
+        "firstName": "Ayrton",
+        "lastName": "Da Silva"
+      },
+      "isCreateMember": true,
+      "isTaxReportedForOwner": true,
+      "isTaxReportedForSigner": true,
+      "isExecuteOwnerLogic": true
+    },
+    {
+      "personNumber": 777454,
+      "name": {
+        "firstName": "Alicia",
+        "lastName": "Keys"
+      },
+      "isCreateMember": true,
+      "isTaxReportedForOwner": false,
+      "isTaxReportedForSigner": false,
+      "isExecuteOwnerLogic": false,
+      "accountRoles": [
+        {
+          "accountRoleCode": "OWN",
+          "accountRoleDescription": "Non tax owner"
+        },
+        {
+          "accountRoleCode": "SIGN",
+          "accountRoleDescription": "Non tax signer"
+        }
+      ]
+    },
+    {
+      "personNumber": 777455,
+      "name": {
+        "firstName": "Nigel",
+        "lastName": "Mansell"
+      },
+      "isCreateMember": false,
+      "isTaxReportedForOwner": false,
+      "isTaxReportedForSigner": false,
+      "isExecuteOwnerLogic": false,
+      "accountRoles": [
+        {
+          "accountRoleCode": "BENE",
+          "accountRoleDescription": "Beneficiary"
+        }
+      ]
+    },
+    {
+      "personNumber": 777456,
+      "name": {
+        "firstName": "Ricardo",
+        "lastName": "Patrese"
+      },
+      "isCreateMember": false,
+      "isTaxReportedForOwner": false,
+      "isTaxReportedForSigner": false,
+      "isExecuteOwnerLogic": false,
+      "accountRoles": [
+        {
+          "accountRoleCode": "BENE",
+          "accountRoleDescription": "Beneficiary"
+        }
+      ]
+    }
+  ]
+}

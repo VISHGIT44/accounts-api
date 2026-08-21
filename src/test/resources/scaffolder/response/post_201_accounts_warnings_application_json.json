@@ -1,0 +1,24 @@
+{
+  "requestNumber": 0,
+  "requestTypeCode": 0,
+  "wasSuccessful": false,
+  "accountWarningResponse": {
+    "accountNumber": 0,
+    "effectiveDate": "",
+    "warningFlagCode": "",
+    "wasSuccessful": false
+  },
+  "errors": [
+    {
+      "errorMessage": "",
+      "errorNumber": "",
+      "oraErrorMessage": "",
+      "rtxnExceptionMessage": "",
+      "rtxnExceptionNumber": ""
+    }
+  ],
+  "userAuthentication": {
+    "errors": "",
+    "wasSuccessful": false
+  }
+}

@@ -1,0 +1,14 @@
+{
+    "minMuleVersion": "4.6.0",
+    "javaSpecificationVersions": ["17"],
+    "secureProperties": [
+        "mule.key",
+        "anypoint.platform.client_id",
+        "anypoint.platform.client_secret",
+        "db.oracle.password",
+        "db.mssql.password",
+        "fiserv.safProdInteg.userId",
+        "fiserv.safProdInteg.password",
+        "email.password"
+    ]
+}

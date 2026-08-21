@@ -1,0 +1,21 @@
+#%RAML 1.0 DataType
+
+displayName: Create Lockout Response
+description: Create Lockout Response
+type: object
+properties:
+  requestNumber?: integer
+  requestTypeCode: integer
+  wasSuccessful: boolean
+  accountLockoutResponse?:
+    type: object
+    properties:
+      accountNumber?: integer
+      effectiveDate?: string
+      lockoutFlagCode?: string
+      wasSuccessful?: boolean
+  errors?: 
+    type: array
+    items:
+      type: !include error.raml
+  userAuthentication: !include user-authentication.raml

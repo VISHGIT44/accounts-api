@@ -1,0 +1,21 @@
+{
+  "channel": "Branch",
+  "zip": "60001",
+  "major": "TD",
+  "minor?": "CD12",
+  "minorDescription?": "12 Month Certificate",
+  "state": "IL",
+  "regionOrgNumber": null,
+  "region": "Default",
+  "branchOrgNumber": 10,
+  "branch": "ACCOUNTING DEPARTMENT",
+  "calcSched": 33,
+  "calcSchedName?": "12 Month CD",
+  "tier": 2,
+  "beginBalance": 1000,
+  "endBalance": 999999999.99,
+  "rate": 0.0296,
+  "effdate": "2023-03-24T00:00:00",
+  "inactivedate": null,
+  "myrank": 1
+}

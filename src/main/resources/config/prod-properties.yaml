@@ -1,0 +1,73 @@
+api:
+  id: "16453000"
+  
+tls.keystore:
+  type: "PKCS12"
+  path: "cert/accounts-api-dev.p12"
+  alias: "tfcu"
+  
+tls.truststore:
+  type: "PKCS12"
+  path: "cert/fiserv-trust-store-dev.p12"
+  
+httpRequester:
+  host: "tfcu-production-dlb.lb.anypointdns.net"
+  port: "443"
+  path: "/api/*"
+  connectionIdleTimeoutMilliseconds: "90000"
+  responseTimeoutMilliseconds: "90000"
+
+db:
+  oracle:
+    host: "oracle-prod.teachersfcu.org"
+    port: "1521"
+    instance: "PROD"
+    url: "jdbc:oracle:thin:@${db.oracle.host}:${db.oracle.port}/${db.oracle.instance}"
+    user: "japi"
+    connectionWaitTimeout: "0"
+    initialPoolSize: "5"
+    maxPoolSize: "50"
+    minPoolSize: "10"
+    timeToLiveConnectionTimeout: "18000"
+    validateConnectionOnBorrow: "true"
+  pooling:
+    acquire:
+      increment: "5"
+    cache:
+      size: "5"
+  mssql:
+    host: "10.0.102.70"
+    port: ""
+    instance: "coreDB"
+    user: "JAPI-PROD"
+    databaseName: "MulesoftBatchProd"     
+
+fiserv:
+  safProdInteg:
+    applicationId: "7e837e75-2e19-45d5-8c3a-4735a275a6cf"
+    networkNodeName: "FULL"
+    cacheTTLInHours: "8"
+    wsdlPath: "wsdl/safProductIntegration.wsdl"
+    address: "https://saf-prod.teachersfcu.org:10001/SAF/ProductIntegration/ProductIntegration.asmx"
+    timeoutInMilliseconds: "60000"
+  
+  dnaService:
+    wsdlPath: "wsdl/CoreApiService_1.wsdl"
+    address: "https://saf-prod.teachersfcu.org:10001/Extensions/DNA.CoreApiService/CoreApiService.svc/Soap11"
+    timeoutInMilliseconds: "60000"
+  
+email:
+  addressesEmailNotifications: "karynm@teachersfcu.org,laurenwa@teachersfcu.org,dao_development@teachersfcu.org"
+  userName: "send_coreapps@teachersfcu.org"
+
+Failureschedular: "0 59 23 ? * 1-7"
+schedularInterval: "0 */30 * ? * 1-7"
+achRetryInterval: "30000"
+
+drawAccountsRetryInterval: "2000"
+drawAccountsRetriesNumber: "1"
+
+notification:
+   path: "/notification/v1/error/notification"
+   retryCount: "5"
+   retryInterval: "3000"

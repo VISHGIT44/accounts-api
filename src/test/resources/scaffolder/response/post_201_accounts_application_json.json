@@ -1,0 +1,16 @@
+{
+  "requestTypeCode": 7719,
+  "wasSuccessful": true,
+  "accounts": [
+    {
+      "accountNumber": "6006790984",
+      "majorTypeCode": "SAV",
+      "minorTypeCode": "SV01"
+    }
+  ],
+  "userAuthentication": [
+    {
+      "wasSuccessful": true
+    }
+  ]
+}

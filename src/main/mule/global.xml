@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:fiserv-auth="http://www.mulesoft.org/schema/mule/fiserv-auth"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd 
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/fiserv-auth http://www.mulesoft.org/schema/mule/fiserv-auth/current/mule-fiserv-auth.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+	<http:listener-config name="apiHttpListenerConfig">
+		<http:listener-connection host="0.0.0.0"
+			port="${https.private.port}" protocol="HTTPS" tlsContext="apiTLSContext" />
+	</http:listener-config>
+	<apikit:config name="apiConfig"
+		api="accounts-system-api.raml"
+		outboundHeadersMapName="outboundHeaders"
+		httpStatusVarName="httpStatus" />
+	<secure-properties:config
+		name="secureEnvPropsConfig" doc:name="Secure Properties Config"
+		doc:id="175074bf-5ced-447f-ad69-40bfbbdb60b3"
+		file="config/${mule.env}-secure-properties.yaml" key="${mule.key}">
+	</secure-properties:config>
+	<tls:context name="apiTLSContext" doc:name="TLS Context"
+		doc:id="6cda6d8a-1cfb-4d57-98e5-b73b655f9416">
+		<tls:trust-store insecure="true" />
+		<tls:key-store type="pkcs12" path="${tls.keystore.path}"
+			alias="${tls.keystore.alias}"
+			keyPassword="${secure::tls.keystore.password}"
+			password="${secure::tls.keystore.keyPassword}" />
+	</tls:context>
+	<configuration-properties
+		doc:name="Configuration properties"
+		doc:id="c9203e54-8e56-487d-b43a-efa0bb48b0a5"
+		file="config/${mule.env}-properties.yaml" />
+	<fiserv-auth:config
+		name="fiservAuthenticationConfig"
+		doc:name="Fiserv Authentication Config"
+		doc:id="398727fb-c0e0-402c-bc0d-b918254e9f16"
+	    cacheTimeToLiveInHours="${fiserv.safProdInteg.cacheTTLInHours}"
+		wsdlPath="${fiserv.safProdInteg.wsdlPath}" userId="${secure::fiserv.safProdInteg.userId}"
+		password="${secure::fiserv.safProdInteg.password}"
+		trustStorePath="${tls.truststore.path}"
+		trustStorePassword="${secure::tls.truststore.password}" trustStoreType="${tls.truststore.type}"
+		address="${fiserv.safProdInteg.address}" timeoutInMilliseconds="${fiserv.safProdInteg.timeoutInMilliseconds}"/>
+	<wsc:config name="dnaServiceConfig"
+		doc:name="Web Service Consumer Config"
+		doc:id="0ed86cf3-4830-427e-89cd-a47fc0cda0cd">
+		<wsc:connection
+			wsdlLocation="${fiserv.dnaService.wsdlPath}" service="CoreApiService"
+			port="BasicHttpBinding_ICoreApiService"
+			address="${fiserv.dnaService.address}">
+			<wsc:custom-transport-configuration>
+				<wsc:http-transport-configuration
+					requesterConfig="dnaHttpsRequestConfig" />
+			</wsc:custom-transport-configuration>
+		</wsc:connection>
+	</wsc:config>
+	<db:config name="Fiserv_Database_Config" doc:name="Database Config" doc:id="79e12c06-f23d-407d-956b-abb6b07de561" >
+		<db:oracle-connection host="${db.oracle.host}" user="${db.oracle.user}" password="${secure::db.oracle.password}" instance="${db.oracle.instance}" port="${db.oracle.port}"/>
+	</db:config>
+	<http:request-config
+		name="dnaHttpsRequestConfig" doc:name="HTTP Request configuration"
+		doc:id="84bb8b33-8f45-41b8-91f0-bbdbb4b3132a" responseTimeout="${fiserv.dnaService.timeoutInMilliseconds}" sendCorrelationId="ALWAYS">
+		<http:request-connection protocol="HTTPS">
+			<tls:context>
+				<tls:trust-store path="${tls.truststore.path}" password="${secure::tls.truststore.password}" type="${tls.truststore.type}"/>
+			</tls:context>
+		</http:request-connection>
+	</http:request-config>
+	<http:request-config name="httpRequester-notification-api" doc:name="HTTP Request configuration" doc:id="33085a23-3a65-43c6-9c70-03d13a9dddca" responseTimeout="${httpRequester.responseTimeoutMilliseconds}">
+		<http:request-connection host="${httpRequester.host}" port="${httpRequester.port}" connectionIdleTimeout="${httpRequester.connectionIdleTimeoutMilliseconds}" protocol="HTTPS" tlsContext="apiTLSContext"/>
+	</http:request-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="6c156b3c-93d1-4144-8f1b-ac40cce009bc" file="config/properties.yaml" />
+	<api-gateway:autodiscovery apiId="${api.id}" doc:name="API Autodiscovery" doc:id="507b778b-a500-4239-b164-7d13cac8c78d" flowRef="api-main" />
+	<configuration doc:name="Configuration" doc:id="f5b37e77-bf92-4792-a072-3334964cc971" defaultErrorHandler-ref="general-error-handler" />
+	<db:config name="CoreDB_Database_Config" doc:name="Database Config" doc:id="415e5c9a-3c31-406f-8d49-848243127906" >
+<db:mssql-connection host="${db.mssql.host}" instanceName="${db.mssql.instance}" user="${db.mssql.user}" password="${secure::db.mssql.password}" databaseName="${db.mssql.databaseName}" >
+			<db:connection-properties >
+				<db:connection-property key="trustServerCertificate" value="true" />
+			</db:connection-properties>
+		</db:mssql-connection>
+</db:config>
+<email:smtp-config name="Email_SMTP_EmailNotificaitions" doc:name="Email SMTP" doc:id="86c036b6-1355-4732-b184-d93b142fed87" >
+<email:smtp-connection host="gmail-relay.teachersfcu.org" user="${email.userName}" password="${secure::email.password}" connectionTimeout="15" readTimeout="15" writeTimeout="15">
+</email:smtp-connection>
+</email:smtp-config>
+</mule>

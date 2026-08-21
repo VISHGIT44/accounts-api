@@ -1,0 +1,78 @@
+{
+  "requestTypeCode": 7704,
+  "wasSuccessful": true,
+  "accounts": [
+    {
+      "account": {
+        "accountInfo": {
+          "accountCurrencyCode": "USD",
+          "accountStatusCode": "ACT",
+          "accountStatusDescription": "Active",
+          "amountDue": 0,
+          "availableBalance": 50,
+          "availableCredit": 0,
+          "branchOrgName": "Teachers FCU - TEST2",
+          "branchOrgNumber": "1",
+          "cardHoldAmount": 0,
+          "checkHoldAmount": 0,
+          "currentBalance": 50,
+          "deliveryMethodCode": "PRNT",
+          "deliveryMethodDescription": "Printed Statement",
+          "hasLoanLimit": false,
+          "hasRestrictions": false,
+          "interestCycleCode": "EOQ",
+          "interestCycleDescription": "End of Quarter",
+          "interestRate": 0,
+          "interestYield": 0,
+          "isPassbookAccount": false,
+          "isTransactionAccount": true,
+          "isValid": true,
+          "lastContactDate": "2020-07-14T00:00:00",
+          "managementHoldAmount": 0,
+          "openDate": "2020-07-14T00:00:00",
+          "ownershipCode": "S",
+          "ownershipDescription": "Single",
+          "regDDAvailableBalance": 50,
+          "statementCycleCode": "PEM1",
+          "statementCycleDescription": "Monthly Printed Stmt 1"
+        },
+        "accountNumber": "6006790653",
+        "isExternalEntity": false,
+        "product": {
+          "canDrawFrom": false,
+          "canWriteChecks": true,
+          "displayName": "Share Draft Checking",
+          "majorAccountType": "CK",
+          "minorAccountType": "CK02",
+          "productFullName": "Share Draft Checking Checking",
+          "productName": "Share Draft Checking"
+        },
+        "roles": [
+          {
+            "role": {
+              "canTransact": true,
+              "entityName": "TEST AVOKA",
+              "entityNumber": "777480",
+              "entityTypeCode": "PERS",
+              "isEmployeeRole": false,
+              "roleCode": "STAX",
+              "roleDescription": "Tax Reported Signator "
+            }
+          }
+        ],
+        "taxOwner": {
+          "ownerName": "TEST AVOKA",
+          "ownerPersonNumber": 777480,
+          "signerName": "TEST AVOKA",
+          "signerPersonNumber": 777480
+        },
+        "userFields": null
+      }
+    }
+  ],
+  "userAuthentication": [
+    {
+      "wasSuccessful": true
+    }
+  ]
+}

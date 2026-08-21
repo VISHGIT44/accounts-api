@@ -1,0 +1,293 @@
+#%RAML 1.0
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/0e1d975e-aefc-4d8e-bfea-0078b165a596/ # 
+version: v1
+title: Accounts System API
+description: The Accounts System API unlocks data and information from Core Accounts system. 
+mediaType: application/json
+
+uses:
+  commonLibrary: exchange_modules/4a5248bb-d9bc-4dbe-b4f6-8fb73e261dd4/common-library/1.0.4/common-library.raml
+
+securedBy: commonLibrary.client-id-enforcement
+
+types:
+  createAccountRequest: !include datatypes/create-account-request.raml
+  createAccountResponse: !include datatypes/create-account-response.raml
+  transferRequest: !include datatypes/transfer-request.raml
+  transferResponse: !include datatypes/transfer-response.raml
+  achTransferRequest: !include datatypes/ach-transfer-request.raml
+  achTransferResponse: !include datatypes/ach-transfer-response.raml
+  minorChangeMaintenanceRequest: !include datatypes/minor-change-maintenance-request.raml
+  minorChangeMaintenanceResponse: !include datatypes/minor-change-maintenance-response.raml
+  createAccountWarningRequest: !include datatypes/create-warning-request.raml
+  createAccountWarningResponse: !include datatypes/create-warning-response.raml
+  createAccountLockoutRequest: !include datatypes/create-lockout-request.raml
+  createAccountLockoutResponse: !include datatypes/create-lockout-response.raml
+  getAccountWarningsResponse: !include datatypes/get-account-warnings-response.raml
+  getAccountLockoutsResponse: !include datatypes/get-account-lockouts-response.raml
+  createCardAgreementRequest: !include datatypes/create-card-agreement-request.raml
+  createCardAgreementResponse: !include datatypes/create-card-agreement-response.raml
+  monetaryTransactionRequest: !include datatypes/monetary-transaction-request.raml
+  monetaryTransactionResponse: !include datatypes/monetary-transaction-response.raml
+  accountMaintenanceRequest: !include datatypes/account-maintenance-request.raml
+  getInterestRatesResponse: !include datatypes/get-cd-interest-rates.raml
+  updateAccountRoleRequest: !include datatypes/account-role-update-request.raml
+  updateAccountRoleResponse: !include datatypes/account-role-update-response.raml
+  linkStatementAccountRequest: !include datatypes/link-statement-account-request.raml
+  linkStatementAccountResponse: !include datatypes/link-statement-account-response.raml
+  linkDrawAccountRequest: !include datatypes/link-draw-account-request.raml
+  linkDrawAccountResponse: !include datatypes/link-draw-account-response.raml
+
+
+/accounts:
+  displayName: Accounts
+  description: This resource is used to interact with accounts.
+  is:
+    - commonLibrary.trackable
+    - commonLibrary.defaultErrors
+  get:
+    displayName: Get Accounts by Person Number, Organization Number
+    description: This endpoint provides a mechanism to retrieve the list of accounts for a Person and Organization given as query parameter person-number(optional) and organization-number(optional).(If both person & organization are not passed or empty, we will throw an error invalid request. “Need person-number or organization-number as input query-parameter”)
+    queryParameters:
+      person-number:
+        displayName: Person Number
+        type: integer
+        required: false
+      organization-number:
+        displayName: Organization Number
+        type: string
+        required: false
+      source-system:
+        displayName: Soruce System
+        type: string
+        required: false
+      skipRepossessionFlag:
+        displayName: skip Repossession Flag
+        type: boolean
+        required: false
+    responses:
+      200:
+        body:
+
+  post:
+    displayName: Create new account
+    description: This endpoint is used to create a new account.
+    body:
+      type: createAccountRequest
+    responses:
+      201:
+        body:
+          type: createAccountResponse
+
+  /{account-number}:
+    displayName: Account
+    description: This resource is used to interact with a specific account.
+    is:
+      - commonLibrary.trackable
+      - commonLibrary.defaultErrors
+    uriParameters:
+      account-number:
+        displayName: Account Number
+        type: integer
+        required: true
+    get:
+      displayName: Get Account Details
+      description: This endpoint provides a mechanism to retrieve specific account details.
+      responses:
+        200:
+          body:
+              
+    patch:
+      displayName: Update Account
+      description: This resource is used to Update account information. Currently only the Minor Account Code of an account can be updated.
+      body:
+        type: minorChangeMaintenanceRequest
+      responses:
+        200:
+          body:
+            type: minorChangeMaintenanceResponse
+
+    /warnings:
+      displayName: Warnings
+      description: This resource is used to interact with account warnings.
+      is:
+        - commonLibrary.trackable
+        - commonLibrary.defaultErrors
+      get:
+        displayName: Get warnings
+        description: This endpoint is used to get warnings.
+        responses:
+          200:
+            body:
+              type: getAccountWarningsResponse
+      post:
+        displayName: Create new warnings
+        description: This endpoint is used to create a new warnings.
+        body:
+          type: createAccountWarningRequest
+        responses:
+          200:
+            body:
+              type: createAccountWarningResponse
+    /lockouts:
+      displayName: Lockouts
+      description: This resource is used to interact with account Lockouts.
+      is:
+        - commonLibrary.trackable
+        - commonLibrary.defaultErrors
+      get:
+        displayName: Get lockouts
+        description: This endpoint is used to get lockouts.
+        responses:
+          200:
+            body:
+              type: getAccountLockoutsResponse
+      post:
+        displayName: Create new Lockouts
+        description: This endpoint is used to create a new Lockouts.
+        body:
+          type: createAccountLockoutRequest
+        responses:
+          200:
+            body:
+              type: createAccountLockoutResponse
+    /card-agreements:
+      displayName: Card Agreement
+      description: This resource is used to interact with Card Agreement.
+      is:
+        - commonLibrary.trackable
+        - commonLibrary.defaultErrors
+      post:
+        displayName: Create new Card Agreement
+        description: This endpoint is used to create a new Card Agreement.
+        body:
+          type: createCardAgreementRequest
+        responses:
+          200:
+            body:
+              type: createCardAgreementResponse
+    /roles:
+      displayName: Roles
+      description: This resource is used to update roles on an account.
+      is:
+        - commonLibrary.trackable
+        - commonLibrary.defaultErrors
+      post:
+        displayName: Update roles on account.
+        description: This endpoint is used to update roles on an account.
+        body:
+          type: updateAccountRoleRequest
+        responses:
+          200:
+            body:
+              type: updateAccountRoleResponse
+    /link-statement-account:
+      displayName: Link Statement Account
+      description: This resource is used to update roles on an account.
+      is:
+        - commonLibrary.trackable
+        - commonLibrary.defaultErrors
+      post:
+        displayName: Link Statement Account.
+        description: This endpoint is used to link share statement on the application account.
+        body:
+          type: linkStatementAccountRequest
+        responses:
+          200:
+            body:
+              type: linkStatementAccountResponse
+    /link-draw-account:
+      displayName: Link Draw Account
+      description: Draw account operations.
+      is:
+        - commonLibrary.trackable
+        - commonLibrary.defaultErrors
+      post:
+        displayName: Link Draw Account.
+        description: This endpoint is used to link draw account.
+        body:
+          type: linkDrawAccountRequest
+        responses:
+          200:
+            body:
+              type: linkDrawAccountResponse
+  /products:
+    displayName: Products service
+    /interestRate:
+        displayName: CD interest rates service
+        get:
+          displayName: Get the interest rates of CD products
+          queryParameters:
+            productName: string
+            channel: string
+            zipCode: string
+            branchId: 
+              type: string
+              pattern: '^[a-zA-Z0-9]*$'
+          responses:
+            200:
+              body:
+                type: getInterestRatesResponse
+/transfers:
+  displayName: Transfers
+  description: This resource is used to interact with transfers.
+  is:
+    - commonLibrary.trackable
+    - commonLibrary.defaultErrors
+  post:
+    displayName: Trasnsfer fund
+    description: This endpoint provides a mechanism to create a transfer fund between specific accounts.
+    body:
+      type: transferRequest
+    responses:
+      201:
+        body:
+          type: transferResponse
+/ach-transfers:
+  displayName: External Transfers
+  description: This resource is used to interact with external transfers.
+  is:
+    - commonLibrary.trackable
+    - commonLibrary.defaultErrors
+  post:
+    displayName: External Trasnsfer fund
+    description: This endpoint provides a mechanism to create a transfer fund between specific accounts.
+    body:
+      type: achTransferRequest
+    responses:
+      201:
+        body:
+          type: achTransferResponse          
+/monetary-transactions:
+  displayName: Monetary Transactions
+  description: This resource is used to create Monetary Transactions.
+  is:
+    - commonLibrary.trackable
+    - commonLibrary.defaultErrors
+  post:
+    displayName: Monetary Transaction
+    description: This endpoint provides a mechanism to create a Monetary Transaction.
+    body:
+      type: monetaryTransactionRequest
+    responses:
+      201:
+        body:
+          type: monetaryTransactionResponse
+/account-maintenance-request:
+  displayName: Account Maintenance Request
+  description: This resource is used to update Accounts Maintenance request.
+  is:
+    - commonLibrary.trackable
+    - commonLibrary.defaultErrors
+  post:
+    displayName:  Account Maintenance Request
+    description: This resource is used to update Accounts Maintenance request.
+    body:
+      type: accountMaintenanceRequest
+    responses:
+      201:
+        body:
+          type: accountMaintenanceRequest
+
+                  
+          

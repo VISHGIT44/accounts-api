@@ -1,0 +1,24 @@
+tls.keystore:
+  password: "![Gfd1a2eIrRIk6BxAlCYq3g==]"
+  keyPassword: "![Gfd1a2eIrRIk6BxAlCYq3g==]"
+
+tls.truststore:
+  password: "![Gfd1a2eIrRIk6BxAlCYq3g==]"
+  
+db:
+  oracle:
+    password: "![8WvBPwap2hb8aP1w0cMauRHYoxnRb/ULT39ykZIZSHE=]"
+  mssql:
+    password: "![8WvBPwap2hb8aP1w0cMauRHYoxnRb/ULT39ykZIZSHE=]"  
+
+fiserv:
+  safProdInteg:
+    userId: "![QEphbOHcR8x9hYdQ0PD7FA==]"
+    password: "![g/HDYiSoa7bCE1PUTbErgA==]"
+
+email:
+  password: "![/GZ/M9a56qYjqqMCU9dDwqPSH6u9k1dZyvyMxyQo1D6t+WlVtqVP18nLdda8mcI4i0P6sKxK40Oi9o7llobDKA==]"
+  
+notification:
+  client_id: "![sYTFpqhB2o567j35VUeJa7sUeCRXBpM3+2woHPQvjM27k4h1RaRBccbdA7QJzOxL]"
+  client_secret: "![lL95geirGy6U8nAARgRIeUq0Ob8mNvL0wR9h7Vvg1Jkgy7cyIW4GhcA52uJx837m]"

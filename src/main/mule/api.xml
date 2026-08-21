@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+    <flow name="api-main">
+        <http:listener path="/api/*" config-ref="apiHttpListenerConfig">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {} ++ 
+	{
+		"X-Correlation-ID": correlationId,
+		"X-Transaction-ID": uuid()
+	}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {} ++ {
+		"X-Correlation-ID": correlationId,
+		"X-Transaction-ID": uuid()
+	}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="apiConfig" />
+    </flow>
+    <flow name="get:\accounts:apiConfig" doc:id="4c9c5e7a-5b37-4037-a1bd-f2c7d92aa908">
+        <ee:transform doc:name="Transform Message" doc:id="9aef0cb3-51c5-4246-bcf2-a0fb3e074800">
+            <ee:variables>
+                <ee:set-variable variableName="personNumber"><![CDATA[attributes.queryParams.'person-number']]></ee:set-variable>
+                <ee:set-variable variableName="sourceSystem"><![CDATA[attributes.queryParams.'source-system']]></ee:set-variable>
+                <ee:set-variable variableName="orgNumber"><![CDATA[attributes.queryParams.'organization-number']]></ee:set-variable>
+                <ee:set-variable variableName="skipRepossessionFlag"><![CDATA[attributes.queryParams.'skipRepossessionFlag' default false]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <flow-ref doc:name="get-accounts-by-person-number" doc:id="07649ee8-4633-4fd6-ad21-5e1ab4dafd0d" name="get-accounts-by-person-number" />
+    </flow>
+    <flow name="get:\accounts\(account-number):apiConfig">
+        <ee:transform>
+            <ee:variables>
+                <ee:set-variable variableName="accountNumber"><![CDATA[attributes.uriParams.'account-number']]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <flow-ref doc:name="get-account-by-account-number" doc:id="fe2788fa-dcb9-4160-b0fd-434067dd7973" name="get-account-by-account-number" />
+    </flow>
+    <flow name="patch:\accounts\(account-number):application\json:apiConfig">
+        <ee:transform>
+            <ee:variables>
+                <ee:set-variable variableName="accountNumber"><![CDATA[attributes.uriParams.'account-number']]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <flow-ref doc:name="minor-change-maintenance" doc:id="b28c16df-5a6f-4ae9-abe2-b0009ccd883d" name="minor-change-maintenance" />
+    </flow>
+    <flow name="post:\accounts\(account-number)\warnings:application\json:apiConfig">
+        <ee:transform>
+            <ee:variables>
+                <ee:set-variable variableName="accountNumber">attributes.uriParams.'account-number'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <flow-ref doc:name="create-account-warning" doc:id="df8df0b0-9aef-4ef3-9db9-ce3eb9ed0ed7" name="create-account-warning" />
+    </flow>
+    <flow name="get:\accounts\(account-number)\warnings:apiConfig" doc:id="debf65b8-7f74-4e6f-882a-f7286fe0b571">
+        <ee:transform doc:name="Transform Message" doc:id="d0c787b0-9c3e-46c2-a8ec-edfbda649dff">
+            <ee:variables>
+                <ee:set-variable variableName="accountNumber"><![CDATA[attributes.uriParams.'account-number']]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <flow-ref doc:name="get-account-warnings" doc:id="4afb4660-3f8e-4593-b275-1f8ea13fc055" name="get-account-warnings" />
+    </flow>
+    <flow name="post:\accounts\(account-number)\lockouts:application\json:apiConfig" doc:id="6399704c-7523-4787-ba00-19c739049952">
+        <ee:transform doc:name="Transform Message" doc:id="a2821b28-dd80-41c2-b53f-ea41bee8eaf8">
+            <ee:variables>
+                <ee:set-variable variableName="accountNumber"><![CDATA[attributes.uriParams.'account-number']]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <flow-ref doc:name="create-account-lockout" doc:id="db4ac21b-5d01-44a1-a181-58d095de18f6" name="create-account-lockout" />
+    </flow>
+    <flow name="get:\accounts\(account-number)\lockouts:apiConfig" doc:id="7f5d9d0a-f1ab-4d8a-bfe7-c43e9cf213a5">
+        <ee:transform doc:name="Transform Message" doc:id="30e220f3-c549-4d6a-b745-ee8b800a8622">
+            <ee:variables>
+                <ee:set-variable variableName="accountNumber"><![CDATA[attributes.uriParams.'account-number']]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" doc:name="Logger" doc:id="80d2af95-dc39-4324-9770-0bfaad73bddc" message="#[&quot;Get lockout Account Request for Account Number ::&quot; ++ vars.accountNumber]" />
+        <flow-ref doc:name="get-account-lockouts" doc:id="fd37c278-2e21-403d-8927-be0a1fa13d4a" name="get-account-lockouts" />
+    </flow>
+    <flow name="post:\accounts\(account-number)\card-agreements:application\json:apiConfig" doc:id="14d16ea0-4000-4377-8b23-7ccc6cf93469">
+        <ee:transform doc:name="Transform Message" doc:id="d35dc157-8200-496d-a6ff-a61321315d2c">
+            <ee:variables>
+                <ee:set-variable variableName="accountNumber"><![CDATA[attributes.uriParams.'account-number']]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <flow-ref doc:name="create-card-agreement" doc:id="38777a54-83ef-4cb2-8aac-0a339ade2948" name="create-card-agreement" />
+    </flow>
+    <flow name="post:\accounts:application\json:apiConfig">
+        <flow-ref doc:name="create-account" doc:id="6212c679-f093-4f27-a09f-f33bc297cb44" name="create-account" />
+    </flow>
+    <flow name="post:\transfers:application\json:apiConfig">
+        <flow-ref doc:name="transfer-funds" doc:id="3ca8773c-eb0e-4742-a319-da3abe7e220a" name="transfer-funds" />
+    </flow>
+    <flow name="post:\ach-transfers:application\json:apiConfig">
+        <logger level="INFO" doc:name="Start Log" doc:id="919a03da-8a80-48c7-97b7-00d74def5408" message="ach-transfer implementation flow started" />
+        <set-variable value="#[payload.toAccountNumber]" doc:name="To Account Number" doc:id="21eae76b-a968-4f75-a568-ed8cb791b0d0" variableName="accountNumber" />
+        <set-variable value="#[payload.extAcctNbr]" doc:name="From Account Number" doc:id="cb2d4ff1-4f89-411f-8600-e1168daa65dd" variableName="fromAccountNumber" />
+        <set-variable value="#[payload]" doc:name="Original Request" doc:id="0956b8c0-6d91-49e8-b065-e11d579cdba8" variableName="originalRequest" />
+        <flow-ref doc:name="ach-transfer-funds" doc:id="8ac483d6-4a31-43c0-b0cb-0ded03aa6a44" name="ach-transfer-funds" />
+        <logger level="INFO" doc:name="End Log" doc:id="acb470d9-b12e-4095-8794-d43867d13a13" message="ach-transfer implementation flow Ended" />
+        <error-handler>
+            <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="9405141f-9950-4879-aa84-33cf94a362fa">
+                <logger level="ERROR" doc:name="Error Log" doc:id="4bfbfe10-4f41-428c-ae71-da185ac2b4bb" message="ach-transaction failed and moved to retry" />
+                <ee:transform doc:name="Form failure reprocessing request" doc:id="5af71ea4-daa8-4b45-bf4a-23671c07b371">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	request: vars.originalRequest,
+	errorMessage: error.exception.'type'
+}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="escapedRequest"><![CDATA[%dw 2.0
+output application/json
+---
+write(vars.originalRequest, "application/json")]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+                <db:insert doc:name="Add failed transaction to DB" doc:id="99e60b20-f6ca-4bc7-8881-8af84507d569" config-ref="CoreDB_Database_Config">
+                    <db:sql><![CDATA[INSERT INTO ACHFailedRequests (Account_number, From_account_number, Request, Error_message, Status, 
+	Request_date, Last_processed_date) VALUES (:toAccountNumber, :fromAccountNumber, :request, :errorMessage, :status, :requestDate, :lastProcessedDate)]]></db:sql>
+                    <db:input-parameters><![CDATA[#[{
+	'toAccountNumber': vars.accountNumber,
+	'fromAccountNumber': vars.fromAccountNumber,
+	'request': write(vars.originalRequest, "application/json"),
+	'errorMessage': payload.errorMessage,
+	'status': 'Pending',
+	'requestDate': now() as String {format: "y-MM-dd"},
+	'lastProcessedDate':now() as String {format: "y-MM-dd"}
+}]]]></db:input-parameters>
+                </db:insert>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="post:\monetary-transactions:application\json:apiConfig" doc:id="a30d793d-8045-4afc-849c-9b39e1dda60b">
+        <flow-ref doc:name="create-monetary-transaction" doc:id="bb357fc7-1596-4279-a77b-9e9930e16c9f" name="create-monetary-transaction" />
+    </flow>
+    <flow name="post:\account-maintenance-request:application\json:apiConfig">
+        <flow-ref doc:name="account-maintenance-request" doc:id="8353ba3a-4b95-46bd-9228-4cc188985e87" name="account-maintenance-request" />
+    </flow>
+    <flow name="get:\accounts\products\interestRate:apiConfig">
+        <ee:transform doc:id="c2969cd8-d11c-4ac7-8af6-64a4c65cbc2e">
+            <ee:message />
+            <ee:variables>
+                <ee:set-variable variableName="productName"><![CDATA[attributes.queryParams.'productName']]></ee:set-variable>
+                <ee:set-variable variableName="channel"><![CDATA[attributes.queryParams.'channel']]></ee:set-variable>
+                <ee:set-variable variableName="zipCode"><![CDATA[attributes.queryParams.'zipCode']]></ee:set-variable>
+                <ee:set-variable variableName="branchId"><![CDATA[attributes.queryParams.'branchId']]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" doc:name="Logger" doc:id="42c3384a-e5ce-4fae-a419-f9d95a1911c5" message="Retriving interest rates for product name-#[vars.productName], channel-#[vars.channel], zipcode-#[vars.ZipCode] and branch id-#[vars.branchId]" />
+        <flow-ref doc:name="retrieve-interest-rates" doc:id="69b04a09-0c4d-4731-9262-b3be4f7d3fda" name="retrieve-interest-rates" />
+    </flow>
+    <flow name="post:\accounts\(account-number)\roles:application\json:apiConfig">
+        <ee:transform>
+            <ee:variables>
+                <ee:set-variable variableName="accountNumber"><![CDATA[attributes.uriParams.'account-number']]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <flow-ref doc:name="account-role-maintenance" doc:id="d24e182c-e47d-49d0-a8c2-d0f64cae16f7" name="account-role-maintenance" />
+    </flow>
+    <flow name="post:\accounts\(account-number)\link-statement-account:application\json:apiConfig">
+        <ee:transform>
+            <ee:variables>
+                <ee:set-variable variableName="account-number">attributes.uriParams.'account-number'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <flow-ref doc:name="account-statement-linking" doc:id="e96abe5f-049a-4425-a8ba-de656d01531c" name="account-statement-linking" />
+    </flow>
+    <flow name="post:\accounts\(account-number)\link-draw-account:application\json:apiConfig">
+        <ee:transform doc:name="Set Account Number Variable">
+            <ee:variables>
+				<ee:set-variable variableName="accountNumber" ><![CDATA[attributes.uriParams.'account-number']]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+		<flow-ref doc:name="courtesy-opt-in" doc:id="c0396240-dbd2-4dee-a0b8-e818a524351e" name="courtesy-opt-in"/>
+    </flow>
+</mule>

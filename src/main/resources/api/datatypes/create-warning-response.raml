@@ -1,0 +1,21 @@
+#%RAML 1.0 DataType
+
+displayName: Create Warning Response
+description: Create Warning Response
+type: object
+properties:
+  requestNumber?: integer
+  requestTypeCode: integer
+  wasSuccessful: boolean
+  accountWarningResponse?:
+    type: object
+    properties:
+      accountNumber?: integer
+      effectiveDate?: string
+      warningFlagCode?: string
+      wasSuccessful?: boolean
+  errors?: 
+    type: array
+    items:
+      type: !include error.raml
+  userAuthentication: !include user-authentication.raml

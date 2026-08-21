@@ -1,0 +1,70 @@
+{
+  "requestTypeCode": 7702,
+  "wasSuccessful": true,
+  "accountCurrencyCode": "USD",
+  "accountNumber": "6006785240",
+  "amountDue": 0,
+  "availableBalance": -0.95,
+  "availableCredit": 0,  
+  "branchOrganizationName": "Teachers FCU - TEST2",
+  "branchOrganizationNumber": "1",
+  "cardHoldAmount": 0,
+  "checkHoldAmount": 0,
+  "currentAccountStatusCode": "ACT",
+  "currentAccountStatusDescription": "Active",
+  "currentBalance": 0.05,
+  "deliveryMethodCode": "PRNT",
+  "deliveryMethodCodeDescription": "Printed Statement",
+  "interestAccountCycleCode": "EOQ",
+  "interestAccountCycleCodeDescription": "End of Quarter",
+  "interestRate": 0,
+  "interestYield": "0",
+  "isChecks": false,
+  "isExternalEntity": false,
+  "isLoanLimit": false,
+  "isPassbook": false,
+  "isRestriction": false,
+  "isRetirement": false,
+  "isTransactionAccount": false,
+  "isValid": true,
+  "lastContactDate": "2020-07-17T00:00:00",
+  "majorAccountTypeCode": "SAV",
+  "managementHoldAmount": 0,
+  "minorAccountTypeCode": "SV01",
+  "minorCustomerDescription": "Regular Savings",
+  "openDate": "2020-05-21T00:00:00",
+  "ownershipCode": "JA",
+  "ownershipCodeDescription": "Joint And",
+  "productFullName": "Regular Savings Savings",
+  "productName": "Regular Savings",
+  "regDDAvailableBalance": -0.95,
+  "signerFullname": "John S. Smith",
+  "signerPersonNumber": 777363,
+  "statementAccountCycleCode": "PEQ1",
+  "statementAccountCycleCodeDescription": "Quarterly Printed Stmt 1",
+  "taxOwnerFullname": "John S. Smith",
+  "taxPersonNumber": 777363,
+  "roles": [
+    {
+      "canTransact": false,
+      "entityName": "Charles Smith",
+      "entityNumber": "777395",
+      "entityTypeCode": "PERS",
+      "isEmployeeRole": false,
+      "roleCode": "BENE",
+      "roleDescription": "Beneficiary"
+    }
+  ],
+  "balances": [
+    {
+      "balanceCategoryCode": "NOTE",
+      "balanceTypeCode": "RBAL"
+    }
+  ],
+  "userFields": null,
+  "userAuthentication": [
+    {
+      "wasSuccessful": true
+    }
+  ]
+}

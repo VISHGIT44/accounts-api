@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<error-handler name="general-error-handler"
+		doc:id="6b045680-c7ff-4d9e-9178-e6773da34972">
+		<on-error-propagate type="APIKIT:BAD_REQUEST">
+			<ee:transform
+				xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+				xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:name="setErrorDetails">
+				<ee:message>
+					<ee:set-payload resource="dw/apikit/errorBadRequest.dwl" />
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[400
+					]]></ee:set-variable>
+					<ee:set-variable variableName="errorNotification" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"severity": "Warning",
+	"errorCode": error.errorType.identifier default "ERROR",
+	"errorMessage": error.description default error.description,
+	"errorSource": error.errorType.namespace default "MULE",
+	"actualErrorCode": error.errorType.parentErrorType.namespace default "MULE" ++ ":" ++ error.errorType.parentErrorType.identifier default "ANY"
+}]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<async doc:name="Async" doc:id="0d933e68-75c0-4af0-8ae9-c3456e2fc2f8" >
+				<flow-ref doc:name="error-notification-flow" doc:id="aaaac016-1322-4caf-bf5a-73f11d6f2e57" name="error-notification-flow"/>
+			</async>
+		</on-error-propagate>
+		<on-error-propagate type="APIKIT:NOT_FOUND">
+			<ee:transform
+				xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+				xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:name="setErrorDetails">
+				<ee:message>
+					<ee:set-payload resource="dw/apikit/errorNotFound.dwl" />
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[404
+					]]></ee:set-variable>
+					<ee:set-variable variableName="errorNotification" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"severity": "Warning",
+	"errorCode": error.errorType.identifier default "ERROR",
+	"errorMessage": error.description default error.description,
+	"errorSource": error.errorType.namespace default "MULE",
+	"actualErrorCode": error.errorType.parentErrorType.namespace default "MULE" ++ ":" ++ error.errorType.parentErrorType.identifier default "ANY"
+}]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<async doc:name="Async" doc:id="2a27bbec-8abf-45ec-b8c6-87659ff02925" >
+				<flow-ref doc:name="error-notification-flow" doc:id="59c90f3c-3e65-413c-984b-4a777b69f419" name="error-notification-flow"/>
+			</async>
+		</on-error-propagate>
+		<on-error-propagate
+			type="APIKIT:METHOD_NOT_ALLOWED">
+			<ee:transform
+				xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+				xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:name="setErrorDetails">
+				<ee:message>
+					<ee:set-payload resource="dw/apikit/errorMethodNotAllowed.dwl" />
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[405
+					]]></ee:set-variable>
+					<ee:set-variable variableName="errorNotification" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"severity": "Warning",
+	"errorCode": error.errorType.identifier default "ERROR",
+	"errorMessage": error.description default error.description,
+	"errorSource": error.errorType.namespace default "MULE",
+	"actualErrorCode": error.errorType.parentErrorType.namespace default "MULE" ++ ":" ++ error.errorType.parentErrorType.identifier default "ANY"
+}]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<async doc:name="Async" doc:id="257731f9-5d84-45c9-810f-2493dedb039a" >
+				<flow-ref doc:name="error-notification-flow" doc:id="5d89dffb-fc3a-455d-9a6c-ca751f316ee3" name="error-notification-flow"/>
+			</async>
+		</on-error-propagate>
+		<on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+			<ee:transform
+				xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+				xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:name="setErrorDetails">
+				<ee:message>
+					<ee:set-payload resource="dw/apikit/errorNotAcceptable.dwl" />
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[406
+					]]></ee:set-variable>
+					<ee:set-variable variableName="errorNotification" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"severity": "Warning",
+	"errorCode": error.errorType.identifier default "ERROR",
+	"errorMessage": error.description default error.description,
+	"errorSource": error.errorType.namespace default "MULE",
+	"actualErrorCode": error.errorType.parentErrorType.namespace default "MULE" ++ ":" ++ error.errorType.parentErrorType.identifier default "ANY"
+}]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<async doc:name="Async" doc:id="41b1308e-a28e-44f8-ac6b-0f7051caa9d6" >
+				<flow-ref doc:name="error-notification-flow" doc:id="1b964b0a-a87c-4194-998a-ace9e88fe5c2" name="error-notification-flow"/>
+			</async>
+		</on-error-propagate>
+		<on-error-propagate
+			type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+			<ee:transform
+				xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+				xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:name="setErrorDetails">
+				<ee:message>
+					<ee:set-payload resource="dw/apikit/errorUnsupportedMediaType.dwl" />
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[415
+					]]></ee:set-variable>
+					<ee:set-variable variableName="errorNotification" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"severity": "Warning",
+	"errorCode": error.errorType.identifier default "ERROR",
+	"errorMessage": error.description default error.description,
+	"errorSource": error.errorType.namespace default "MULE",
+	"actualErrorCode": error.errorType.parentErrorType.namespace default "MULE" ++ ":" ++ error.errorType.parentErrorType.identifier default "ANY"
+}]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<async doc:name="Async" doc:id="76a5f33b-087c-4ef6-adb2-6fe4de24238a" >
+				<flow-ref doc:name="error-notification-flow" doc:id="238113d4-22f6-4657-8bef-d2cb9ec96555" name="error-notification-flow"/>
+			</async>
+		</on-error-propagate>
+		<on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+			<ee:transform
+				xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+				xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:name="setErrorDetails">
+				<ee:message>
+					<ee:set-payload resource="dw/apikit/errorNotImplemented.dwl" />
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[501
+					]]></ee:set-variable>
+					<ee:set-variable variableName="errorNotification" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"severity": "Warning",
+	"errorCode": error.errorType.identifier default "ERROR",
+	"errorMessage": error.description default error.description,
+	"errorSource": error.errorType.namespace default "MULE",
+	"actualErrorCode": error.errorType.parentErrorType.namespace default "MULE" ++ ":" ++ error.errorType.parentErrorType.identifier default "ANY"
+}]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<async doc:name="Async" doc:id="828f4063-7d53-4bda-ab85-8fd5b0a391b9" >
+				<flow-ref doc:name="error-notification-flow" doc:id="42e982bd-6661-4c3f-87b9-6d3ba966bfd5" name="error-notification-flow"/>
+			</async>
+		</on-error-propagate>
+
+        <on-error-propagate type="ANY" enableNotifications="true" logException="true">
+             <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:name="setErrorDetails">
+                 <ee:message>
+			<ee:set-payload resource="dw/error/errorAny.dwl" />
+                 </ee:message>
+                 <ee:variables>
+                     <ee:set-variable variableName="httpStatus"><![CDATA[500]]></ee:set-variable>
+					<ee:set-variable variableName="errorNotification" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"severity": "Warning",
+	"errorCode": error.errorType.identifier default "ERROR",
+	"errorMessage": error.description default error.description,
+	"errorSource": error.errorType.namespace default "MULE",
+	"actualErrorCode": error.errorType.parentErrorType.namespace default "MULE" ++ ":" ++ error.errorType.parentErrorType.identifier default "ANY"
+}]]></ee:set-variable>
+                 </ee:variables>
+             </ee:transform>
+			<async doc:name="Async" doc:id="853539c8-9d98-4df0-8e10-e957cce88a0b" >
+				<flow-ref doc:name="error-notification-flow" doc:id="d48e44e5-9a1a-421f-879e-1e3603807aae" name="error-notification-flow"/>
+			</async>
+         </on-error-propagate>
+
+	</error-handler>
+	<flow name="error-notification-flow" doc:id="4d5c948d-748e-4ce8-824b-b020116fb84d" >
+		<ee:transform doc:name="Notification Request" doc:id="1c78db6b-e3e8-46e7-ae14-f96fbd9eb5b2" >
+			<ee:message >
+				<ee:set-payload resource="dw\notificationRequest.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Notification Request Logger" doc:id="cdd6c459-35bd-4f2b-a67b-7178c6b13091" message="Error Notification Request logger" category="error-notification-flow" />
+		<until-successful maxRetries="${notification.retryCount}" doc:name="Until Successful" doc:id="7e4f1f8b-3cd8-4b39-b719-06085711a7d2" millisBetweenRetries="${notification.retryInterval}" >
+			<http:request method="POST" doc:name="Send Notification" doc:id="051bcfd6-503d-48f9-9692-bea6d45566fd" config-ref="httpRequester-notification-api" path="${notification.path}" sendCorrelationId="ALWAYS" correlationId="#[correlationId]" >
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_secret" : Mule::p("secure::notification.client_secret"),
+	"client_id" : Mule::p("secure::notification.client_id")
+}]]]></http:headers>
+			</http:request>
+		</until-successful>
+		<logger level="INFO" doc:name="Notification Response Logger" doc:id="38a948e2-9897-45df-941c-1156a953b897" message="Error Notification Response logger" category="error-notification-flow" />
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="9a917ba7-699f-4e31-b690-d8807223d074" type="ANY">
+				<logger level="ERROR" doc:name="Notification Exception Logger" doc:id="7b4029a5-e2b5-47ad-9e29-9b603e98f1b8" message="Error while processing in Notification Flow - #[error.description]" category="error-notification-flow"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+</mule>

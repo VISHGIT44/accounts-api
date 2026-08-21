@@ -1,0 +1,6 @@
+api:
+  name: "Accounts System API"
+
+https:
+  private:
+    port: "8092"

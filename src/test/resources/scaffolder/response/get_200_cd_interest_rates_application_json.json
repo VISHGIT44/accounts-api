@@ -1,0 +1,10 @@
+{
+    "majorAccTypCd": "TD",
+    "minorAccTypCd": "CD60",
+    "minorAccTypDesc": "60 Month Certificate",
+    "calcSchedNum": 39,
+    "calcRate": 0.0272,
+    "calcTierNum": 2,
+    "effDate": "2022-06-15T00:00:00",
+    "inactiveDate": null
+}

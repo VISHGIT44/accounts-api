@@ -1,0 +1,1307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:fiserv-auth="http://www.mulesoft.org/schema/mule/fiserv-auth"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/fiserv-auth http://www.mulesoft.org/schema/mule/fiserv-auth/current/mule-fiserv-auth.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
+	<flow name="get-accounts-by-person-number"
+		doc:id="06ee6f92-a364-4695-a3c4-f6bff8700f34">
+		<logger level="INFO" doc:name="Logger"
+			doc:id="89d734b6-6d85-4b40-a7f1-aa7f4a8e2d97"
+			message="getAccountbypersonNumber_OrgNumber" />
+		<choice doc:name="Choice"
+			doc:id="8cf5dadd-58f3-4ecb-9a6d-46aeabf93bc6">
+			<when
+				expression='#[vars.personNumber != null and vars.personNumber != ""]'>
+				<logger level="INFO" doc:name="Logger"
+					doc:id="04051c20-c908-4053-9bd3-f90973a01a97"
+					message="Person Number is : #[vars.personNumber]" />
+				<logger level="INFO" doc:name="Logger" doc:id="0ea8ab47-fa60-4351-9f85-f0513482924d" message="Sample Logger!!!"/>
+				<flow-ref doc:name="get-user-authentication"
+					doc:id="f59ff5d7-b82b-457e-b4e0-3507e1cc78d4"
+					name="get-user-authentication" target="userAuthorization" />
+				<ee:transform doc:name="Construct Person Request"
+					doc:id="e2e868dc-e44b-4220-9aea-f9e2b1eb9cf0">
+					<ee:message>
+						<ee:set-payload
+							resource="dw/constructAccountLookupByPersonNumberRequest.dwl" />
+					</ee:message>
+				</ee:transform>
+				<flow-ref doc:name="get-accounts-by-person-number-org-number"
+					doc:id="849bd467-e91a-4063-a782-c6a3b725b97a"
+					name="get-accounts-by-person-number-org-number" />
+			
+</when>
+			<when
+				expression='#[vars.orgNumber != null and  vars.orgNumber != ""]'>
+				<logger level="INFO" doc:name="Logger"
+					doc:id="d1c9cf29-f88a-4712-8f77-fee9493bb1a0"
+					message="Orgnaization Number is : #[vars.orgNumber]" />
+				<flow-ref doc:name="get-user-authentication"
+					doc:id="eba12b06-bfe6-4180-bc19-617e89b526ca"
+					name="get-user-authentication" target="userAuthorization" />
+				<ee:transform doc:name="Construct Organization Request"
+					doc:id="b655a8ae-3f98-4e76-af6c-550c957c26ec">
+					<ee:message>
+						<ee:set-payload
+							resource="dw/constructAccountLookupByOrgNumberRequest.dwl" />
+					</ee:message>
+				</ee:transform>
+				<flow-ref doc:name="get-accounts-by-person-number-org-number"
+					doc:id="14f6e194-f7e5-48f7-9ee8-14d4ad2cbac4"
+					name="get-accounts-by-person-number-org-number" />
+			</when>
+			<when
+				expression="#[isBlank(vars.personNumber) and isBlank(vars.orgNumber)]">
+				<logger level="INFO" doc:name="Logger"
+					doc:id="456e97e2-1366-4109-88be-818f473af2b9"
+					message="Both person-number and  organization-number are empty" />
+				<raise-error doc:name="Raise error"
+					doc:id="41d9384a-f6b0-407c-8b6b-707f41a0912b"
+					type="ACCOUNTS:INVALID_REQUEST"
+					description="Need person-number or organization-number as input query-parameter" />
+			</when>
+			<otherwise>
+				<logger level="INFO" doc:name="Logger"
+					doc:id="d839e7c7-04b7-4d9c-aa50-b93b989b3a5d"
+					message="Default logger" />
+			</otherwise>
+		</choice>
+	</flow>
+	<sub-flow name="get-accounts-by-person-number-org-number"
+		doc:id="ed610477-b72f-4b1c-ad83-8e89d67c964d">
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="5f749e40-9bd7-4bba-a0b1-7bf4316d1e1d" message="#[payload]" />
+		<until-successful maxRetries="3" doc:name="Until Successful" doc:id="3ff51729-1fa4-44f0-84ac-6493d7f44e4b" millisBetweenRetries="2000">
+			<wsc:consume doc:name="Get Accounts" doc:id="9a9f63bd-1f8e-4536-ba34-ef7d186eb75e" config-ref="dnaServiceConfig" operation="SubmitRequest" />
+		</until-successful>
+		<ee:transform doc:name="Accounts and Error Check"
+			doc:id="1e54110a-c359-4ec3-bf3a-161c9b970273">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="accountCheck"><![CDATA[%dw 2.0
+output application/java
+ns fs http://www.opensolutions.com/CoreApi
+ns cm http://schemas.datacontract.org/2004/07/OpenSolutions.CoreApiService.Services.Messages
+ns open http://www.opensolutions.com/CoreApi
+
+var messagePayload = message.payload.body.open#SubmitRequestResponse.open#SubmitRequestResult
+---
+
+accountInfo: if(messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#Accounts.*cm#EntityAccount != null) "accountsAvailable" else "noAccountsAvailable"]]></ee:set-variable>
+				<ee:set-variable variableName="errorCheck"><![CDATA[%dw 2.0
+output application/java
+ns fs http://www.opensolutions.com/CoreApi
+ns cm http://schemas.datacontract.org/2004/07/OpenSolutions.CoreApiService.Services.Messages
+ns open http://www.opensolutions.com/CoreApi
+
+var messagePayload = message.payload.body.open#SubmitRequestResponse.open#SubmitRequestResult
+---
+
+'userAuthentication': messagePayload.fs#Output.*fs#UserAuthentication map ((item, index) -> {
+    	'wasSuccessful': item.WasSuccessful as Boolean,
+    	('errors': item.Errors.*Error map ((item,index)->{
+    		'errorMessage': item.ErrorMessage,
+    		'errorNumber': item.ErrorNumber as Number,
+    		'oraErrorMessage': item.OraErrorMessage,
+    		('rtxnExceptionMessage': item.RtxnExceptionMessage) if(item.RtxnExceptionMessage != null),
+    		('rtxnExceptionNumber': item.RtxnExceptionNumber) if(item.RtxnExceptionNumber != null)
+    	})) if(item.Errors.*Error != null)
+	})]]></ee:set-variable>
+				<ee:set-variable
+					variableName="chargedOffAccountPresent"><![CDATA[%dw 2.0
+output application/java
+ns fs http://www.opensolutions.com/CoreApi
+ns cm http://schemas.datacontract.org/2004/07/OpenSolutions.CoreApiService.Services.Messages
+ns open http://www.opensolutions.com/CoreApi
+var messagePayload = message.payload.body.open#SubmitRequestResponse.open#SubmitRequestResult
+---
+chargeOffAccount: (null != messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#Accounts.*cm#EntityAccount) and (sizeOf(messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#Accounts.*cm#EntityAccount map {
+	status: $.AccountInfo.cm#AccountStatusCode,
+	RoleDetail: $.cm#Roles.*RoleDetail map ((item, index) -> {
+		personNumber: item.EntityNumber,
+		roleCode: item.RoleCode
+	}) filter ($.personNumber == vars.personNumber and ($.roleCode == "TAX" or $.roleCode == "OWN"))
+} filter ($.status == "CO" and sizeOf($.RoleDetail) > 0)) > 0 default false)]]></ee:set-variable>
+				<ee:set-variable
+					variableName="dormantAccountPresent"><![CDATA[%dw 2.0
+output application/java
+ns fs http://www.opensolutions.com/CoreApi
+ns cm http://schemas.datacontract.org/2004/07/OpenSolutions.CoreApiService.Services.Messages
+ns open http://www.opensolutions.com/CoreApi
+var messagePayload = message.payload.body.open#SubmitRequestResponse.open#SubmitRequestResult
+---
+dormantAccount: (null != messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#Accounts.*cm#EntityAccount) and (sizeOf(messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#Accounts.*cm#EntityAccount map {
+	status: $.AccountInfo.cm#AccountStatusCode,
+	RoleDetail: $.cm#Roles.*RoleDetail map ((item, index) -> {
+		personNumber: item.EntityNumber,
+		roleCode: item.RoleCode
+	}) filter ($.personNumber == vars.personNumber and ($.roleCode == "TAX" or $.roleCode == "OWN"))
+} filter ($.status == "DORM" and sizeOf($.RoleDetail) > 0)) > 0 default false)]]></ee:set-variable>
+<ee:set-variable variableName="accountNumbersResponseList" ><![CDATA[%dw 2.0
+output application/java
+ns fs http://www.opensolutions.com/CoreApi
+ns cm http://schemas.datacontract.org/2004/07/OpenSolutions.CoreApiService.Services.Messages
+ns open http://www.opensolutions.com/CoreApi
+
+var messagePayload = message.payload.body.open#SubmitRequestResponse.open#SubmitRequestResult
+---
+
+((messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#Accounts.*cm#EntityAccount map {
+    accountNumber: $.AccountNumber,
+	status: $.AccountInfo.cm#AccountStatusCode,
+	RoleDetail: $.cm#Roles.*RoleDetail map ((item, index) -> {
+		personNumber: item.EntityNumber,
+		roleCode: item.RoleCode
+	}) filter ($.personNumber == vars.personNumber and ($.roleCode == "TAX" or $.roleCode == "OWN"))
+}) filter ($.status != "CLS" and sizeOf($.RoleDetail) > 0)).accountNumber  default []]]></ee:set-variable>
+				<ee:set-variable variableName="inactiveAccountsCheck" ><![CDATA[%dw 2.0
+output application/java
+ns fs http://www.opensolutions.com/CoreApi
+ns cm http://schemas.datacontract.org/2004/07/OpenSolutions.CoreApiService.Services.Messages
+ns open http://www.opensolutions.com/CoreApi
+
+var messagePayload = message.payload.body.open#SubmitRequestResponse.open#SubmitRequestResult
+---
+inactiveAccount: (null != messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#Accounts.*cm#EntityAccount) and (sizeOf(messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#Accounts.*cm#EntityAccount map {
+	status: $.AccountInfo.cm#AccountStatusCode,
+	RoleDetail: $.cm#Roles.*RoleDetail map ((item, index) -> {
+		personNumber: item.EntityNumber,
+		roleCode: item.RoleCode
+	}) filter ($.personNumber == vars.personNumber and ($.roleCode == "TAX" or $.roleCode == "OWN"))
+} filter ($.status == "IACT" and sizeOf($.RoleDetail) > 0)) > 0 default false)]]></ee:set-variable>
+			
+</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Error Check"
+			doc:id="a8125072-a840-4804-99f7-06f582528a4c"
+			message="Error check status:: #[vars.errorCheck] " />
+		<logger level="INFO" doc:name="Var Logger"
+			doc:id="be29c95f-8423-4a73-96b3-ee7c5aea2c0e"
+			message="Accounts check status:: #[vars.accountCheck] " />
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="869ab0d4-f442-44b7-8afd-add76930ed40" message="#[payload]" />
+			<choice doc:name="Choice"
+			doc:id="5f22a46e-f8f8-4176-b843-0d2aa9f0964e">
+			<when
+				expression="#[vars.accountCheck.accountInfo == 'accountsAvailable' and vars.sourceSystem == &quot;Avoka&quot;]">
+				<flow-ref doc:name="Lockout Accounts flow"
+					doc:id="9195bfa9-8742-49c6-8cf3-e1ab13251feb"
+					name="get-accounts-lockouts-flow" />
+				<choice doc:name="Choice"
+					doc:id="acd7b1fd-6c0c-49aa-b12d-fac5894db15a">
+					<when expression='#[vars.riskStatus == true]'>
+						<logger level="INFO" doc:name="Logger"
+							doc:id="b67aea64-52a5-47fc-b089-db976deedf2e"
+							message='#["Risk Status:" ++ vars.riskStatus]' />
+						<ee:transform doc:name="repossessionFlagsCount" doc:id="ebadd406-f827-47dc-905c-35a6ae883178">
+							<ee:message>
+							</ee:message>
+							<ee:variables >
+								<ee:set-variable variableName="repossessionFlagsCount" ><![CDATA[%dw 2.0
+output application/json
+var repossessionFlags = ['CCD','REPO','REPS','REPH','RPAU','SNSC']
+---
+sizeOf(vars.riskLockoutsAccounts filter ( repossessionFlags contains  $))
+
+]]></ee:set-variable>
+								<ee:set-variable variableName="ccdFlagsCount" ><![CDATA[%dw 2.0
+output application/java
+---
+sizeOf(vars.ccdFlags)]]></ee:set-variable>
+							</ee:variables>
+						</ee:transform>
+						<ee:transform doc:name="manualriskAccountFilter" doc:id="78aad29f-9c26-47a2-82b6-caced65152b5">
+							<ee:message>
+								<ee:set-payload resource="dw/manualriskAccountFilter.dwl" />
+							</ee:message>
+								<ee:variables>
+								</ee:variables>
+						</ee:transform>
+						<ee:transform doc:name="manualriskResponse" doc:id="dddeda78-4741-4a16-80b6-ecc7518dccea">
+							<ee:message>
+								<ee:set-payload resource="dw/manualriskResponse.dwl" />
+							</ee:message>
+						</ee:transform>
+						<logger level="INFO" doc:name="Logger"
+							doc:id="ceb43632-c6dc-4a7e-93d7-5619ec9da973"
+							message="#[payload]" />
+					
+</when>
+					<when
+						expression="#[vars.chargedOffAccountPresent.chargeOffAccount == true]">
+						<logger level="INFO" doc:name="Logger" doc:id="010e1f88-039d-4ae0-bc1d-0ee2af9e0e7e" message="Charge off accounts are present!"/>
+						<ee:transform
+							doc:name="Charge Off Accounts present"
+							doc:id="da1f2afc-2366-4298-80fb-7c67990e0b21">
+							<ee:message>
+								<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    "message": "Error",  
+	"description": "Charge Off accounts are present"
+}]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+						<logger level="INFO" doc:name="Logger"
+							doc:id="30f199b1-4be8-4cf0-b8dc-88d5e0420103"
+							message="#[payload]" />
+					
+</when>
+     			<when expression="#[vars.dormantAccountPresent.dormantAccount == true]">
+						<logger level="INFO" doc:name="Logger" doc:id="cbdd46ac-16b1-4acd-877a-3c798a7037d8" message="Dormant accounts are present!" />
+						<ee:transform doc:name="Dormant Accounts present" doc:id="3a559d26-a012-4b6b-b0c6-9e4d4fbcfa5c" >
+							<ee:message >
+								<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Error",  
+	"description": "Dormant accounts are present"
+}]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+						<logger level="INFO" doc:name="Logger" doc:id="d0a70881-c96a-4c78-b5e4-f72a49a81d94" message="#[payload]" />
+					</when>
+					<when expression="#[vars.inactiveAccountsCheck.inactiveAccount == true]">
+						<logger level="INFO" doc:name="Logger" doc:id="886633bd-025d-414a-a25a-7f999d128d29" message="InActive accounts are present!" />
+						<ee:transform doc:name="Inactive Accounts present" doc:id="a13a80d3-98cd-4c2e-8d7f-0ff0caf30d61">
+							<ee:message>
+								<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Error",
+	"description": "Inactive accounts are present"
+}]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+						<logger level="INFO" doc:name="Logger" doc:id="73d133bf-a315-4215-8abf-cf32aa2e5ae3" message="#[payload]" />
+					</when>
+					<otherwise>
+						<ee:transform doc:name="ConstuctAvokaResponse"
+							doc:id="be80ab05-c1ea-4da2-949a-f8a8770c279a">
+							<ee:message>
+								<ee:set-payload
+									resource="dw/constructAccountLookupByPersonNumberAvokaResponse.dwl" />
+							</ee:message>
+						</ee:transform>
+						<ee:transform doc:name="Accounts Filter" doc:id="75e6bd9d-551d-49c5-9c2e-8aecce662851">
+							<ee:message>
+								<ee:set-payload><![CDATA[%dw 2.0
+import * from dw::util::Values
+output application/json
+
+var personNumber = vars.personNumber
+
+// Function to filter accounts based on person number
+fun filterAccounts(payload: Object, personNumber: String) =
+        payload update field("accounts") with (payload.accounts filter (accountObj) -> 
+            (accountObj.account != null and accountObj.account.roles != null and sizeOf((accountObj.account.roles filter (roleObj) -> roleObj.role != null and
+                    roleObj.role.entityNumber == personNumber and
+                    ((roleObj.role.roleCode == "OTAX" or roleObj.role.roleCode == "OWN") or
+                    (roleObj.role.roleCode == "STAX" or roleObj.role.roleCode == "SIGN")) )) > 0))       
+
+--- 
+// Call the filter function
+if (payload != null and payload.accounts != null) filterAccounts(payload, personNumber) else payload]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+					</otherwise>
+				</choice>
+			</when>
+			<when
+				expression="#[vars.accountCheck.accountInfo == 'accountsAvailable' and vars.sourceSystem != &quot;Avoka&quot;]">
+				<logger level="INFO" doc:name="Log Source System"
+					doc:id="6e101d83-7f4b-4eba-a639-e5241a295162"
+					message='#["Source System is: " ++ vars.sourceSystem]' />
+				<ee:transform doc:name="Construct Response"
+					doc:id="7e219d53-b63b-46de-96b4-ec6ccb001897">
+					<ee:message>
+						<ee:set-payload
+							resource="dw/constructAccountLookupByPersonNumberResponse.dwl" />
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise>
+				<ee:transform doc:name="No Accounts"
+					doc:id="a8df9bd8-8f4d-4d05-b58a-a57106323e44">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    "requestTypeCode": 7704,
+    "wasSuccessful": true,
+    "accounts": [],
+    "userAuthentication": [
+        {
+            "wasSuccessful": true
+        }
+    ]
+}
+]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger"
+					doc:id="0e9afd2b-ebfd-485b-9e3a-2b8e9f813ef9" message="#[payload]" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+	
+	<flow name="get-account-by-account-number"
+		doc:id="55e984b8-be42-4cd2-9298-7bd2bb9756fc">
+		<flow-ref doc:name="get-user-authentication"
+			doc:id="cb95ef0d-c90d-4ef1-b671-4c967a53ecc3"
+			name="get-user-authentication" target="userAuthorization" />
+		<ee:transform doc:name="Construct Request"
+			doc:id="15a06b2f-a877-49fb-984b-0eb5fe38e792">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/constructAccountLookupRequest.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="1fedde43-b3c2-4afb-af89-f040492fb459" message="#[payload]" />
+		<wsc:consume doc:name="Get Account details"
+			doc:id="a0fefca0-eaac-41b3-b03a-05b5d119aa87"
+			config-ref="dnaServiceConfig" operation="SubmitRequest" />
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="ecf039ac-8067-499d-a067-0a9e6a46f80e" message="#[payload]" />
+		<ee:transform doc:name="Construct Response"
+			doc:id="2d916d2b-7aa5-48cf-b58d-b36bcd9e5f31">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/constructAccountLookupResponse.dwl" />
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="create-account"
+		doc:id="f16cf797-e0c6-4dcf-8fc9-8818beef081d">
+		<flow-ref doc:name="get-user-authentication"
+			doc:id="482fd35e-0a53-4999-8774-eae7f57887ad"
+			name="get-user-authentication" target="userAuthorization" />
+		<ee:transform doc:name="Construct Request"
+			doc:id="cf93dcfc-4c5e-475b-87ba-ef92558fc74d">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/constructCreateAccountRequest.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="21244118-40df-405b-b970-2585ffa8abac" message="#[payload]" />
+		<wsc:consume doc:name="Create Account"
+			doc:id="31225a21-e972-4381-b131-2cd175b8c9c4"
+			config-ref="dnaServiceConfig" operation="SubmitRequest" />
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="3052c203-d9a7-4058-a9cd-cd3b68d3692e" message="#[payload]" />
+		<set-variable value="201" doc:name="httpStatus = 201"
+			doc:id="d912a8bc-bd7b-4b68-aba3-17079ec07e16"
+			variableName="httpStatus" />
+		<ee:transform doc:name="Construct Response"
+			doc:id="0f071b23-844d-43f2-9089-8227f6b06088">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/constructCreateAccountResponse.dwl" />
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="minor-change-maintenance"
+		doc:id="6889bc3e-75f2-4df7-97ce-1525b37f734d">
+		<flow-ref doc:name="get-user-authentication"
+			doc:id="f06bfc36-ed9d-45dd-90f1-bb0ebf89f7e2"
+			name="get-user-authentication" target="userAuthorization" />
+		<ee:transform doc:name="Construct Request"
+			doc:id="8f2b67f3-0ce4-439c-a9a5-be99ab79cdab">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/constructMinorChangeMaintenanceRequest.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="5609514c-223d-4607-b00f-9e123e4bfd49" message="#[payload]" />
+		<wsc:consume operation="SubmitRequest"
+			doc:name="Minor Change Maintenance"
+			doc:id="b6424d6c-8c9f-436a-938f-b94bec3e870d"
+			config-ref="dnaServiceConfig" />
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="06ec2edc-dfd5-465c-ad1a-f39420123507" message="#[payload]" />
+		<ee:transform doc:name="Construct Response"
+			doc:id="693b02f8-efd6-4f0b-8dd1-5b38f241a0de">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/constructMinorChangeMaintenanceResponse.dwl" />
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="account-role-maintenance" doc:id="ab39e750-07b1-4b41-afe1-5491defb285e" >
+		<flow-ref doc:name="get-user-authentication" doc:id="86277068-ae14-4a01-83f6-17a274c8c46f" name="get-user-authentication" target="userAuthorization"/>
+		<ee:transform doc:name="Construct Request" doc:id="692b3a64-2fee-43ce-b964-16cceabf632d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns open http://www.opensolutions.com/CoreApi
+ns i http://www.w3.org/2001/XMLSchema-instance
+ns a http://schemas.datacontract.org/2004/07/OpenSolutions.CoreApiService.Services.Messages
+---
+'SubmitRequest' @('xmlns': 'http://www.opensolutions.com/CoreApi'): {
+	'input': {
+		'Input': {
+			'ExtensionRequests': null,
+			'Requests': {
+				'RequestBase' @(i#'type': 'AccountAccountRoleMaintenanceRequest'): {
+					('ParentRequestNumber': payload.parentRequestNumber) if(payload.parentRequestNumber?),
+					('RequestNumber': payload.requestNumber) if(payload.requestNumber?),
+					'AccountRolesRequests': {
+						a#'AccountRoleRequest': payload.accountRoles map {
+							(a#'AccountNumber': $.accountNumber) if ($.accountNumber != null),
+							(a#'AccountRoleCode': $.accountRoleCode) if ($.accountRoleCode != null),
+							(a#'IsInactive': $.isInactive) if ($.isInactive != null),
+							(a#'OrganizationNumber': $.orgNumber) if ($.organizationNumber != null),
+							(a#'PersonNumber': $.personNumber) if ($.personNumber?),
+							(a#'EffectiveDate': $.effectiveDate) if ($.effectiveDate != null),
+						}
+					}
+				}
+			},
+			'UserAuthentication': vars.userAuthorization.'UserAuthentication'
+		},
+		'ShouldCommitOrRollback': 'false'
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="Logger" doc:id="1e898172-555d-492f-9ed2-e2d0ad721e86" message="#[payload]"/>
+		<wsc:consume doc:name="Account Role Maintenance" doc:id="a6895d82-83a2-4699-b70e-04d918fc4110" config-ref="dnaServiceConfig" operation="SubmitRequest"/>
+		<logger level="DEBUG" doc:name="Logger" doc:id="acdf2c8a-60d3-40f0-8dfd-def38a8051cd" message="#[payload]"/>
+		<ee:transform doc:name="Construct Response" doc:id="a9ed4026-984b-46cc-a1c5-0802693200d4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+import * from dw::core::Strings
+ns fs http://www.opensolutions.com/CoreApi
+ns cm http://schemas.datacontract.org/2004/07/OpenSolutions.CoreApiService.Services.Messages
+ns open http://www.opensolutions.com/CoreApi
+
+var messagePayload = message.payload.body.open#SubmitRequestResponse.open#SubmitRequestResult
+---
+{
+	('requestNumber': messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#RequestNumber) if(messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#RequestNumber != null),
+	('requestTypeCode': messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#RequestTypeCode) if(messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#RequestTypeCode?),
+	'wasSuccessful': messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#WasSuccessful as Boolean,
+	'accountResponse': messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#AccountResponses.*cm#AccountResponse map {
+		('accountNumber': $.cm#AccountNumber) if($.cm#AccountNumber != null),
+		('wasSuccessful': $.cm#WasSuccessful) if($.cm#WasSuccessful != null)
+	},
+	('errors': messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#Errors.*fs#Error map ((item, index) -> {
+    		'errorMessage': item.ErrorMessage,
+    		'errorNumber': item.ErrorNumber,
+    		'oraErrorMessage': item.OraErrorMessage,
+    		('rtxnExceptionMessage': item.RtxnExceptionMessage) if(item.RtxnExceptionMessage != null),
+    		('rtxnExceptionNumber': item.RtxnExceptionNumber) if(item.RtxnExceptionNumber != null)
+    })) if(messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#Errors.*fs#Error != null),
+	'userAuthentication': messagePayload.fs#Output.*fs#UserAuthentication map ((item, index) -> {
+    	'wasSuccessful': item.WasSuccessful,
+    	('errors': item.Errors.*Error map ((item,index)->{
+    		'errorMessage': item.ErrorMessage,
+    		'errorNumber': item.ErrorNumber,
+    		'oraErrorMessage': item.OraErrorMessage,
+    		('rtxnExceptionMessage': item.RtxnExceptionMessage) if(item.RtxnExceptionMessage != null),
+    		('rtxnExceptionNumber': item.RtxnExceptionNumber) if(item.RtxnExceptionNumber != null)
+    	})) if(item.Errors.*Error != null)
+	})
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="courtesy-opt-in" doc:id="6969283f-1d07-4998-a891-c8b1f3c977d8" >
+		<flow-ref doc:name="get-user-authentication" doc:id="71a777a8-3a77-41f0-a0a5-8b94f125f315" name="get-user-authentication" target="userAuthorization"/>
+		<ee:transform doc:name="Construct Request" doc:id="3e37a98b-3825-4cc4-a171-d651a081103b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns open http://www.opensolutions.com/CoreApi
+ns i http://www.w3.org/2001/XMLSchema-instance
+ns a http://schemas.datacontract.org/2004/07/OpenSolutions.CoreApiService.Services.Messages
+---
+'SubmitRequest' @('xmlns': 'http://www.opensolutions.com/CoreApi'): {
+	'input': {
+		'Input': {
+			'ExtensionRequests': null,
+			'Requests': {
+				'RequestBase' @(i#'type': 'PersonAgreementMaintenanceRequest'): {
+					('ParentRequestNumber': payload.parentRequestNumber) if(payload.parentRequestNumber?),
+					('RequestNumber': payload.requestNumber) if(payload.requestNumber?),
+					'DrawAccounts': {
+						a#'DrawAccount': payload.drawAccounts map {
+							(a#'AccountNumber': $.accountNumber) if ($.accountNumber != null),
+							(a#'DrawAccountNumber': $.drawAccountNumber) if ($.drawAccountNumber != null),
+							(a#'DrawMethodCode': $.drawMethodCode) if ($.drawMethodCode != null)
+							}
+						},
+					('EntityNumber': payload.entityNumber) if (payload.entityNumber?),
+					('EntityTypeCode': payload.entityTypeCode) if (payload.entityTypeCode?)
+				}
+			},
+			'UserAuthentication': vars.userAuthorization.'UserAuthentication'
+		},
+		'ShouldCommitOrRollback': 'false'
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Log Request" doc:id="829694b1-ec38-4f3e-94a6-f01d2d4e3b65" message="#[payload]"/>
+		<until-successful maxRetries="${drawAccountsRetriesNumber}" doc:name="Until Successful" doc:id="bba59fbf-d620-4acb-be10-a925cfc93ad3" millisBetweenRetries="${drawAccountsRetryInterval}">
+			<wsc:consume operation="SubmitRequest" doc:name="Person Agreement Maintenance" doc:id="3a74b012-bbf2-40d2-a44f-e7915b2386d5" config-ref="dnaServiceConfig" />
+		</until-successful>
+		<logger level="INFO" doc:name="Log Response" doc:id="5a970c5d-4756-4b6c-89db-5acc23980a6a" message="#[payload]"/>
+		<ee:transform doc:name="Construct Response" doc:id="48da6805-eba3-41ef-8f20-9e6fef40fc1a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+ns fs http://www.opensolutions.com/CoreApi
+ns cm http://schemas.datacontract.org/2004/07/OpenSolutions.CoreApiService.Services.Messages
+ns open http://www.opensolutions.com/CoreApi
+
+var messagePayload = message.payload.body.open#SubmitRequestResponse.open#SubmitRequestResult
+---
+{
+	('requestNumber': messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#RequestNumber as Number) if(messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#RequestNumber != null),
+	('requestTypeCode': messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#RequestTypeCode as Number) if(messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#RequestTypeCode?),
+	'wasSuccessful': messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#WasSuccessful as Boolean,
+	'entityNumber': messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#EntityNumber,
+	'entityTypeCode': messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#EntityTypeCode,
+	('errors': messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#Errors.*fs#Error map ((item, index) -> {
+    		'errorMessage': item.ErrorMessage,
+    		'errorNumber': item.ErrorNumber as Number,
+    		'oraErrorMessage': item.OraErrorMessage,
+    		('rtxnExceptionMessage': item.RtxnExceptionMessage) if(item.RtxnExceptionMessage != null),
+    		('rtxnExceptionNumber': item.RtxnExceptionNumber) if(item.RtxnExceptionNumber != null)
+    })) if(messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#Errors.*fs#Error != null),
+	'userAuthentication': messagePayload.fs#Output.*fs#UserAuthentication map ((item, index) -> {
+    	'wasSuccessful': item.WasSuccessful as Boolean,
+    	('errors': item.Errors.*Error map ((item,index)->{
+    		'errorMessage': item.ErrorMessage,
+    		'errorNumber': item.ErrorNumber as Number,
+    		'oraErrorMessage': item.OraErrorMessage,
+    		('rtxnExceptionMessage': item.RtxnExceptionMessage) if(item.RtxnExceptionMessage != null),
+    		('rtxnExceptionNumber': item.RtxnExceptionNumber) if(item.RtxnExceptionNumber != null)
+    	})) if(item.Errors.*Error != null)
+	})
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="account-statement-linking" doc:id="78ab7098-200b-4ad5-bebd-eb5021d6f61d" >
+		<flow-ref doc:name="get-user-authentication" doc:id="6b6b504e-e456-4749-813a-26af06ff8c86" name="get-user-authentication" target="userAuthorization"/>
+		<ee:transform doc:name="Construct Request" doc:id="f3c1ec52-5657-40ea-8a7a-ba62bb7f77e0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns open http://www.opensolutions.com/CoreApi
+ns i http://www.w3.org/2001/XMLSchema-instance
+ns a http://schemas.datacontract.org/2004/07/OpenSolutions.CoreApiService.Services.Messages
+---
+'SubmitRequest' @('xmlns': 'http://www.opensolutions.com/CoreApi'): {
+	'input': {
+		'Input': {
+			'ExtensionRequests': null,
+			'Requests': {
+				'RequestBase' @(i#'type': 'PersonAgreementMaintenanceRequest'): {
+					('ParentRequestNumber': payload.parentRequestNumber) if(payload.parentRequestNumber?),
+					('RequestNumber': payload.requestNumber) if(payload.requestNumber?),
+					('EntityNumber': payload.entityNumber) if (payload.entityNumber?),
+					('EntityTypeCode': payload.entityTypeCode) if (payload.entityTypeCode?),
+					('StatementAccountNumber': payload.statementAccountNumber) if (payload.statementAccountNumber?),
+					'StatementAccounts': payload.statementAccounts map {
+						a#'PersonMaintStatementAccount': {
+							(a#'AccountNumber': $.accountNumber) if ($.accountNumber != null)
+						}
+					}
+				}
+			},
+			'UserAuthentication': vars.userAuthorization.'UserAuthentication'
+		},
+		'ShouldCommitOrRollback': 'false'
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="d2b64bde-f303-4054-aefc-07eaad39df97" />
+		<wsc:consume doc:name="Person Agreement Maintenance" doc:id="0939a879-78c8-4171-89ba-5922bd708968" config-ref="dnaServiceConfig" operation="SubmitRequest"/>
+		<logger level="INFO" doc:name="Logger" doc:id="cc6d8721-4064-4477-a056-2d3e69d7f585" message="#[payload]"/>
+		<ee:transform doc:name="Construct Response" doc:id="910da371-efcd-4c7a-b645-6e6d1bd4e438" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+import * from dw::core::Strings
+ns fs http://www.opensolutions.com/CoreApi
+ns cm http://schemas.datacontract.org/2004/07/OpenSolutions.CoreApiService.Services.Messages
+ns open http://www.opensolutions.com/CoreApi
+
+var messagePayload = message.payload.body.open#SubmitRequestResponse.open#SubmitRequestResult
+---
+{
+	('requestNumber': messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#RequestNumber as Number) if(messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#RequestNumber != null),
+	('requestTypeCode': messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#RequestTypeCode as Number) if(messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#RequestTypeCode?),
+	'wasSuccessful': messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#WasSuccessful as Boolean,
+	'entityNumber': messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#EntityNumber,
+	'entityTypeCode': messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#EntityTypeCode,
+	('errors': messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#Errors.*fs#Error map ((item, index) -> {
+    		'errorMessage': item.ErrorMessage,
+    		'errorNumber': item.ErrorNumber as Number,
+    		'oraErrorMessage': item.OraErrorMessage,
+    		('rtxnExceptionMessage': item.RtxnExceptionMessage) if(item.RtxnExceptionMessage != null),
+    		('rtxnExceptionNumber': item.RtxnExceptionNumber) if(item.RtxnExceptionNumber != null)
+    })) if(messagePayload.fs#Output.fs#Responses.fs#ResponseBase.fs#Errors.*fs#Error != null),
+	'userAuthentication': messagePayload.fs#Output.*fs#UserAuthentication map ((item, index) -> {
+    	'wasSuccessful': item.WasSuccessful as Boolean,
+    	('errors': item.Errors.*Error map ((item,index)->{
+    		'errorMessage': item.ErrorMessage,
+    		'errorNumber': item.ErrorNumber as Number,
+    		'oraErrorMessage': item.OraErrorMessage,
+    		('rtxnExceptionMessage': item.RtxnExceptionMessage) if(item.RtxnExceptionMessage != null),
+    		('rtxnExceptionNumber': item.RtxnExceptionNumber) if(item.RtxnExceptionNumber != null)
+    	})) if(item.Errors.*Error != null)
+	})
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="transfer-funds"
+		doc:id="c0f3a0c4-c967-4d21-a5cc-23d8e2a087df">
+		<flow-ref doc:name="get-user-authentication"
+			doc:id="928caf3b-06fc-41b7-896d-368ba2ed35e5"
+			name="get-user-authentication" target="userAuthorization" />
+		<ee:transform doc:name="Construct Request"
+			doc:id="54c358c2-1edf-4bff-85b6-ac32c0bffeb4">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/constructTransferFundsRequest.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="fe216a37-74af-464e-bda9-c247fd272a8c" message="#[payload]" />
+		<wsc:consume doc:name="Transfer Funds"
+			doc:id="f5e5888a-7bd5-4391-b0a3-73a8bd522581"
+			config-ref="dnaServiceConfig" operation="SubmitRequest" />
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="bd7f3fac-0e67-4ff9-bf5b-55e9cc9b7ac1" message="#[payload]" />
+		<set-variable value="201" doc:name="httpStatus = 201"
+			doc:id="e7ffe1f1-f5e8-4bb0-a65c-67608ca51ba8"
+			variableName="httpStatus" />
+		<ee:transform doc:name="Construct Response"
+			doc:id="c6fdeb14-a6a1-4446-96c6-d51a41db9f15">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/constructTransferFundsResponse.dwl" />
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="ach-transfer-funds"
+		doc:id="ea62cd06-d537-43ca-91f9-584d1830f893">
+		<flow-ref doc:name="get-user-authentication"
+			doc:id="a6aa26f7-ccb8-48d4-9c19-976be20c7b70"
+			name="get-user-authentication" target="userAuthorization" />
+		<ee:transform doc:name="Construct ACH Request" doc:id="f0ba9692-3cbc-4df5-ac6d-bfa280484ec0">
+					<ee:message>
+				<ee:set-payload resource="dw/constructACHTransferFundsRequest.dwl" />
+					</ee:message>
+				</ee:transform>
+		<logger level="INFO" doc:name="Info Log" doc:id="93573bb4-fecc-4684-92ea-9908d9acac49" message="Before calling Fiserv RepetitiveTransferMaintenanceRequest"/>
+		<logger level="DEBUG" doc:name="Debug Log"
+			doc:id="e94c9d35-a397-438f-bbed-399640b306f2" message="Request to Fiserv  --&gt;  #[payload]" />
+		<wsc:consume doc:name="Transfer Funds"
+			doc:id="6ac40438-43e7-4240-8e59-36502c063a0b"
+			config-ref="dnaServiceConfig" operation="SubmitRequest" />
+		<logger level="DEBUG" doc:name="Debug Log"
+			doc:id="7a69e084-a3e3-4ac7-a63b-51249e3434df" message="Response from Fiserv  --&gt;  #[payload]" />
+		<logger level="INFO" doc:name="Info Log" doc:id="1f44b535-0cf9-4324-a901-e61f50b79bac" message="After calling Fiserv RepetitiveTransferMaintenanceRequest" />
+		<set-variable value="201" doc:name="httpStatus = 201"
+			doc:id="c737bb18-761e-4bf5-b878-53053ff4aa06"
+			variableName="httpStatus" />
+		<ee:transform doc:name="Construct Response" doc:id="c747bb3f-a291-4941-a5a9-63fd882ac1e3" >
+			<ee:message >
+				<ee:set-payload resource="dw/constructACHTransferFundsResponse.dwl" />
+			</ee:message>
+		</ee:transform>
+	
+</flow>
+	<flow name="create-account-warning"
+		doc:id="24a36840-7ef0-4524-9794-be54c105acd4">
+		<flow-ref doc:name="get-user-authentication"
+			doc:id="2590ce04-7d78-469f-a0c6-78a7cdd623d1"
+			name="get-user-authentication" target="userAuthorization" />
+		<ee:transform doc:name="Construct Request"
+			doc:id="9ad79aaa-b375-4bac-8e13-810a3de9dc03">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/constructCreateAccountWarningRequest.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="68752fd3-00e1-488d-9f61-868ae7f01375" message="#[payload]" />
+		<wsc:consume operation="SubmitRequest"
+			doc:name="Create Account Warning"
+			doc:id="bb5c7395-406f-4da1-acd4-1a1f9bac6af2"
+			config-ref="dnaServiceConfig" />
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="c4088755-a2a5-4af7-87a3-344c9ab2bd88" message="#[payload]" />
+		<set-variable value="201" doc:name="httpStatus = 201"
+			doc:id="2696bcd4-1e1b-4dca-b7ef-9bed1001c616"
+			variableName="httpStatus" />
+		<ee:transform doc:name="Construct Response"
+			doc:id="c7701fbe-47e8-41b8-9db9-0c768074453e">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/constructCreateAccountWarningResponse.dwl" />
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="get-account-warnings"
+		doc:id="9236b500-0d45-4517-b554-5eae04d587ae">
+		<flow-ref doc:name="get-user-authentication"
+			doc:id="e6899d27-45df-4138-b2f1-0c9d7498dbc5"
+			name="get-user-authentication" target="userAuthorization" />
+		<ee:transform doc:name="Construct Request"
+			doc:id="f4500bef-85c5-4dd0-b4fe-dc5a150b8319">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/constructGetAccountWarningsRequest.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="99f251d6-47b5-49cb-b5ef-ebe29f07f99f" message="#[payload]" />
+		<until-successful maxRetries="3" doc:name="Until Successful" doc:id="400ba332-b282-4053-9fb2-c2107d3b25d5" millisBetweenRetries="2000">
+			<wsc:consume operation="SubmitRequest" doc:name="Get Account Warnings" doc:id="bdb32cac-fb95-4efd-8583-fa82e9407d17" config-ref="dnaServiceConfig" />
+		</until-successful>
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="46093fa1-afd6-4827-b6fe-e622645e99ae" message="#[payload]" />
+		<ee:transform doc:name="Construct Response"
+			doc:id="85229f95-d3ab-4711-a818-feb7bd853ed2">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/constructGetAccountWarningsResponse.dwl" />
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="create-account-lockout"
+		doc:id="bd8da904-9480-4dc8-9a92-2bea6a166373">
+		<flow-ref doc:name="get-user-authentication"
+			doc:id="c6a59ebb-526f-4d28-aa43-477b05530b6b"
+			name="get-user-authentication" target="userAuthorization" />
+		<ee:transform doc:name="Construct Request"
+			doc:id="0ba8b95c-01e6-4705-88be-3b6aca5812e1">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/constructCreateAccountLockoutRequest.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="6f50867a-fcf3-4aaa-93f2-c00eea69c717" message="#[payload]" />
+		<wsc:consume operation="SubmitRequest"
+			doc:name="Create Account Lockouts"
+			doc:id="25c6c2cc-8f5e-4ba6-97d4-d2b5f10eaf72"
+			config-ref="dnaServiceConfig" />
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="f964e7e3-fb3d-46dc-84af-080fa8b0183f" message="#[payload]" />
+		<set-variable value="201" doc:name="httpStatus = 201"
+			doc:id="f7d752ea-cff2-4dd4-b351-49487ec34b4a"
+			variableName="httpStatus" />
+		<ee:transform doc:name="Construct Response"
+			doc:id="d9e5ef25-9e0a-48c9-8f5f-5b2c814c06a5">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/constructCreateAccountLockoutResponse.dwl" />
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="get-account-lockouts"
+		doc:id="bbd8a481-81b8-4f96-a35b-4f1981fb6d4b">
+		<flow-ref doc:name="get-user-authentication"
+			doc:id="9bf66c39-d913-4d15-9340-f3f1cf5541ef"
+			name="get-user-authentication" target="userAuthorization" />
+		<ee:transform doc:name="Construct Request"
+			doc:id="6a5fae81-40c9-4d57-b978-3db06461cf44">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/constructGetAccountLockoutsRequest.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="1109438c-9aad-4d37-a59e-f64fcb62cfa5" message="#[payload]" />
+		<until-successful maxRetries="3" doc:name="Until Successful" doc:id="966799b5-7021-43c3-a1c1-f4749b056db1" millisBetweenRetries="2000">
+			<wsc:consume operation="SubmitRequest" doc:name="Get Account Lockouts" doc:id="f93ac5ad-7a4a-4e4b-9938-4b1dda3ecd8f" config-ref="dnaServiceConfig" />
+		</until-successful>
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="0e9d0c2a-688d-40d7-8556-1c26ca2f295e" message="#[payload]" />
+		<ee:transform doc:name="Construct Response"
+			doc:id="1fb8bfa4-7a82-456c-ad6d-2bf8d5eb988c">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/constructGetAccountLockoutsResponse.dwl" />
+			</ee:message>
+		</ee:transform>
+	
+</flow>
+	<flow name="create-card-agreement"
+		doc:id="4272e5bb-f78c-46b0-9fd4-d77a8aa79aae">
+		<flow-ref doc:name="get-user-authentication"
+			doc:id="0b904653-b33b-408c-a61d-00e5ea0a4e07"
+			name="get-user-authentication" target="userAuthorization" />
+		<ee:transform doc:name="Construct Request"
+			doc:id="3a618ef3-6d21-44e3-bdeb-16097858e4b3">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/constructCreateCardAgreementRequest.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="54c766dd-af91-4229-b096-b6dfa57a77e4" message="#[payload]" />
+		<wsc:consume operation="SubmitRequest"
+			doc:name="Create Card Agreement"
+			doc:id="65a88b99-ca6d-4a1c-aca6-5193974e0443"
+			config-ref="dnaServiceConfig" />
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="d4c9df54-36c0-4333-a9c2-636d371a3c81" message="#[payload]" />
+		<set-variable value="201" doc:name="httpStatus = 201"
+			doc:id="6b4c0dda-9290-469d-a632-48acc5d94a13"
+			variableName="httpStatus" />
+		<ee:transform doc:name="Construct Response"
+			doc:id="11dec0f6-da9e-4782-9922-00b993735c0a">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/constructCreateCardAgreementResponse.dwl" />
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="create-monetary-transaction"
+		doc:id="275ef971-2cf0-406e-86ba-1e223d4576ea">
+		<flow-ref doc:name="get-user-authentication"
+			doc:id="94ab5637-fc39-4668-b7f8-2fd566a98704"
+			name="get-user-authentication" target="userAuthorization" />
+		<ee:transform doc:name="Construct Request"
+			doc:id="4ec9cefd-6bf4-476e-b5dd-f5b4a5abf47d">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/constructMonetaryTransactionRequest.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="fe5ba66b-7340-46ac-bf03-c88b16b644ce" message="#[payload]" />
+		<wsc:consume operation="SubmitRequest"
+			doc:name="Monetary Transaction"
+			doc:id="0d3dab1a-d422-4170-83fc-aae9bc6243d9"
+			config-ref="dnaServiceConfig" />
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="9f3834a3-c9f8-4f24-bf5d-6d9d39bdb470" message="#[payload]" />
+		<set-variable value="201" doc:name="httpStatus = 201"
+			doc:id="4ea83d9a-dba5-4679-8580-0b7c853d33c7"
+			variableName="httpStatus" />
+		<ee:transform doc:name="Construct Response"
+			doc:id="d7364bb4-72e5-4724-b8a5-13291546b4a7">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/constructMonetaryTransactionResponse.dwl" />
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="account-maintenance-request"
+		doc:id="4b232462-7383-45a0-8b26-03942c701fd5">
+		<flow-ref doc:name="get-user-authentication"
+			doc:id="a989281e-7dde-4a0d-9d81-349f2a9403c9"
+			name="get-user-authentication" target="userAuthorization" />
+		<logger level="INFO" doc:name="Logger"
+			doc:id="df7fedd6-2959-4429-a97f-e5975fdd4605"
+			message='#["Account number:: " ++ payload.accountNumber]' />
+		<ee:transform doc:name="Construct Request"
+			doc:id="7849830f-faab-4438-8892-cd9326666577">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/accountMaintenanceRequest.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="451f5d6d-be25-40bd-a76a-749af483f670" message="#[payload]" />
+		<wsc:consume operation="SubmitRequest"
+			doc:name="Account Maintenance"
+			doc:id="295d8c10-7b5b-4967-8922-d9c75f2c6e88"
+			config-ref="dnaServiceConfig" />
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="2c7f51b7-5ceb-4183-8433-eec401a034b4" message="#[payload]" />
+		<set-variable value="201" doc:name="httpStatus = 201"
+			doc:id="03bf2f2e-61fb-4e80-9167-a65f7addd8b7"
+			variableName="httpStatus" />
+		<ee:transform doc:name="Construct Response"
+			doc:id="a4827ece-336d-49f6-a710-6c7300b525f2">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/AccountMaintenanceResponse.dwl" />
+			</ee:message>
+		</ee:transform>
+
+	</flow>
+	<flow name="get-accounts-lockouts-flow"
+		doc:id="c3541e27-417d-4cfb-8e7f-1445551229af">
+		<set-variable value="#[payload]"
+			doc:name="orginalRequest"
+			doc:id="5d64f412-5cf1-48cc-be23-943c766ef3ac"
+			variableName="originalRequest" />
+		<set-variable value="#[[]]"
+			doc:name="Initialize Lockouts Array List"
+			doc:id="eab8ac3d-e8ca-48b7-b3c4-f827ee4b9eee"
+			variableName="lockoutsAccountsList" />
+		<set-variable value="#[[]]"
+			doc:name="Initialize Risk_Manual_Lockouts Array List"
+			doc:id="0fc75a47-51cd-46c3-bdd9-2fa3bf89239b"
+			variableName="riskLockoutsAccounts" />
+		<set-variable value="#[[]]" doc:name="Initialize Manual Review Accounts List" doc:id="927d9a54-9772-4b30-b7f3-4f1edb1157df" variableName="manualReviewAccounts"/>
+		<set-variable value="#[false]" doc:name="riskStatus"
+			doc:id="136cae6c-23b2-45eb-9f53-aaea514f3108"
+			variableName="riskStatus" />
+		<set-variable value="#[[]]" doc:name="ccdFlagsCount" doc:id="cc511211-2311-421f-a672-a7506e74e925" variableName="ccdFlags"/>
+		<foreach doc:name="For Each" doc:id="077f5288-6d68-4327-a56d-cb807607653a" collection="#[vars.accountNumbersResponseList]">
+			<set-variable value="#[payload]" doc:name="accountNumber" doc:id="d424578e-7d2c-41f7-92bc-84299b306b91" variableName="accountNumber" />
+			<logger level="INFO" doc:name="Logger" doc:id="bf56cd39-400f-4a59-955a-db3fd2cd27ab" message='#[%dw 2.0
+&#10;output application/java
+&#10;---
+&#10;"Account Number for Warning and Lockout: "++ vars.accountNumber]' />
+			<scatter-gather doc:name="Scatter-Gather" doc:id="fe9cc8b9-8b6d-4e05-9fbf-314b642b4b6d" >
+				<route >
+					<flow-ref doc:name="get-account-lockouts" doc:id="6169f0f7-fb90-4cea-986b-b5f711f5f921" name="get-account-lockouts" />
+					<ee:transform doc:name="RepossessionFlags Count" doc:id="56be1706-9353-44b4-8f16-42ad47694927">
+						<ee:message />
+						<ee:variables>
+							<ee:set-variable variableName="ccdFlags"><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+var availableFlags = payload.accountLockouts.lockoutFlagCode default []
+---
+vars.ccdFlags + if(availableFlags contains "CCD") 'CCD' else null]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="Lockout_WarningsSub_flow" doc:id="a6e78484-c5a4-4528-ac28-f4075fcf9307" name="lockout-warnings-sub-flow"/>
+				
+</route>
+				<route >
+					<flow-ref doc:name="get-account-warnings" doc:id="22787b07-2719-4626-90a8-1ee6abe394fc" name="get-account-warnings"/>
+					<flow-ref doc:name="Lockout_WarningsSub_flow" doc:id="5e640a8e-d184-4ab6-8997-47be6b856fb4" name="lockout-warnings-sub-flow"/>
+				</route>
+			</scatter-gather>
+		</foreach>
+		<set-variable value="#[vars.risk contains true default false]" doc:name="riskStatus" doc:id="0b3f88bd-55bd-4466-8a99-2970ac75bc05" variableName="riskStatus" />
+		<set-payload value="#[vars.originalRequest]" doc:name="Set Payload to Original Request" doc:id="b1f8bb44-b101-4476-bb2d-a63f49f2405b" />
+	</flow>
+	<sub-flow name="lockout-warnings-sub-flow" doc:id="0f59cd6e-3838-46c4-bb6d-19570a0dbd0a" >
+		<choice doc:name="Choice" doc:id="39503e5a-9e2c-422c-8c24-401a0baecc26">
+				<when expression="#[payload.accountLockouts != null or payload.accountWarnings != null]">
+					<foreach doc:name="For Each" doc:id="529c719c-4b0f-464a-ab43-b9fafae2c78f" collection="#[if (payload.accountLockouts != null) payload.accountLockouts else payload.accountWarnings]">
+						<choice doc:name="Choice" doc:id="c12b30a5-d36e-43c1-8462-6ff220b2cc33">
+				<when expression="#[%dw 2.0&#10;output application/java&#10;var riskStatusAccount = ['DCSD', 'ARKD', 'ARC', 'KYM', 'WFEL', 'SSN', 'SIGN', 'SIG2','CRTO', 'FORE', 'CCD', 'LEGL', 'REPO', 'LGL1', 'LGL2', 'LGL3', 'CHOF', 'NOTR', 'LEGA', 'LEG2', 'RSK1', 'RSK2', 'LRR', 'LSUN', 'LNVC', 'LRCS', 'DCME', 'REPH', 'REPS', 'LWM', 'LEVY', 'KITE', 'MEM1', 'HRSA', 'HSAL', 'RISK', 'LOSS','AMS','CHOF','COCC','8DSA','RPAU','SNSC']&#10;var repossession = ['DCSD', 'ARKD', 'ARC', 'KYM', 'WFEL', 'SSN', 'SIGN', 'SIG2','CRTO', 'FORE', 'LEGL', 'LGL1', 'LGL2', 'LGL3', 'CHOF', 'NOTR', 'LEGA', 'LEG2', 'RSK1', 'RSK2', 'LRR', 'LSUN', 'LNVC', 'LRCS', 'DCME', 'LWM', 'LEVY', 'KITE', 'MEM1', 'HRSA', 'HSAL', 'RISK', 'LOSS','AMS','CHOF','COCC','8DSA','RPAU','SNSC']&#10;---&#10;if (vars.skipRepossessionFlag == false)&#10;riskStatusAccount contains (if (payload.lockoutFlagCode != null) payload.lockoutFlagCode else payload.warningFlagCode)&#10;else&#10;repossession contains (if (payload.lockoutFlagCode != null) payload.lockoutFlagCode else payload.warningFlagCode)]">
+					<logger level="INFO" doc:name="Logger" doc:id="9d4b97f4-474c-4af6-bc55-50ffdf98257e" message='#[%dw 2.0
+&#10;output application/java
+&#10;---
+&#10;{
+&#10;(LockoutDetails:(" Risk Lockout Accounts: "++ payload.lockoutFlagDescription ++ " with lockout Flag Code: "++ payload.lockoutFlagCode ++" for the Account number : " ++ vars.accountNumber)) if (payload.lockoutFlagCode != null),
+&#10;(WarningsDetails:(" Risk/Manual Warnings Accounts: "++ payload.warningFlagDescription ++ " with Warning Flag Code: "++ payload.warningFlagCode ++" for the Account number : " ++ vars.accountNumber)) if (payload.warningFlagCode != null)
+&#10;}]' />
+					<set-variable value="#[true]" doc:name="risk" doc:id="aacfe146-f23d-4a8b-bd4a-0949d9a5a1a5" variableName="risk" />
+								<ee:transform doc:name="riskLockout" doc:id="b0083f84-2b26-41f1-b24e-a0f51c6f1b34">
+									<ee:message>
+									</ee:message>
+									<ee:variables>
+									<ee:set-variable resource="dw/TempriskLockouts.dwl" variableName="riskLockoutsAccounts" />
+									
+</ee:variables>
+								</ee:transform>
+				</when>
+			
+				<when expression="#[%dw 2.0
+&#10;output application/java
+&#10;var filterOutAccount = ['PMTO', 'NWTH', 'FROZ', 'PYOF', 'STOL', 'CLS', 'NDEP', 'NACH', 'BK', 'ANDR', 'HREC', 'CLOC', 'NOAA', 'SPPA', 'CHOF', 'COCC', '8DSA', 'BAI2', 'ALTI', 'ALTE', 'SOLD', 'HAMP', 'MOD', 'OREO', 'RPCH', 'SHSL', 'STMD', 'TDPW', 'TPMT', 'TDR', 'PAYO','RCAP','NCPI','NCUA', 'CUST']
+&#10;---
+&#10;filterOutAccount contains (if (payload.lockoutFlagCode != null) payload.lockoutFlagCode else payload.warningFlagCode)]">
+					<ee:transform doc:name="Adding Lockout Accounts to List" doc:id="1c058a4f-f0ca-4333-85e4-a8dbeb45a8a4">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+										<ee:set-variable resource="dw/TempArrayList.dwl" variableName="lockoutsAccountsList" />
+						</ee:variables>
+					</ee:transform>
+					<logger level="INFO" doc:name="YES-Lockout Account number" doc:id="23c80e3a-147a-4d77-97fe-50bb5755bad9" message='#[%dw 2.0
+&#10;output application/java
+&#10;---
+&#10;{&#10;(LockoutDetails:(" YES---This Account number "++ payload.accountNumber ++ " has Lockout status with Description : "++ payload.lockoutFlagDescription ++ " and lockout Flag Code: "++ payload.lockoutFlagCode)) if (payload.lockoutFlagCode != null),
+&#10;(WarningsDetails:(" YES---This Account number "++ payload.accountNumber ++ " has Warning status with Description : "++ payload.warningFlagDescription ++ " and Warning Flag Code: "++ payload.warningFlagCode)) if (payload.warningFlagCode != null)
+&#10;}]' />
+				</when>
+						<otherwise>
+					<logger level="INFO" doc:name="Lockout Account" doc:id="8bb83134-509b-4960-a916-e95904a7ffa2" message='#[%dw 2.0
+&#10;output application/java
+&#10;---
+&#10;{
+&#10;(LockoutDetails:(" Different Lockout Account: "++ payload.lockoutFlagDescription ++ " lockout Flag Code: "++ payload.lockoutFlagCode ++" for the Account number : " ++ payload.accountNumber)) if (payload.lockoutFlagCode != null),
+&#10;(WarningDetails:(" Different Warning Account: "++ payload.warningFlagDescription ++ " Warning Flag Code: "++ payload.warningFlagCode ++" for the Account number : " ++ payload.accountNumber)) if (payload.warningFlagCode != null)
+&#10;}]' />
+				</otherwise>
+			</choice>
+					</foreach>
+				</when>
+				<otherwise>
+					<logger level="INFO" doc:name="NO-Lockout Account" doc:id="54d778cf-595c-45c2-95fe-cffd105a417b" message='#["NO---Lockout Account "++ vars.accountNumber]' />
+				</otherwise>
+			</choice>
+	</sub-flow>
+	<flow name="retrieve-interest-rates" doc:id="fb140dd8-bd9c-4c9d-a37a-25e646020ded" >
+		<flow-ref doc:name="getMajorType" doc:id="93fbe441-7959-4fcc-80dd-58862fea7b60" name="get-major-type"/>
+		<ee:transform doc:name="InputParameters" doc:id="e8055316-44df-4c23-9170-b5a34e73ad47" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Channel":vars.channel,
+	"ZipCode":vars.ZipCode,
+	"Major":vars.productDetails.MAJOR_TYPE_CODE[0],
+	"Minor":vars.productName,
+	"BranchId":vars.branchId
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="2f0f0d58-db30-499c-b221-20494cc9bfde" message="The major product type code is #[payload.Major]"/>
+		<db:select doc:name="Retrieve interest rates" doc:id="d40cd8a3-c231-49ee-a91d-b9438f9d26b6" config-ref="Fiserv_Database_Config" targetValue="#[payload[0]]">
+			<db:sql ><![CDATA[select * from ositeachers.fnsql_avoka_zip_mjmi_rate(:Channel,:ZipCode,:Major,:Minor,:BranchId)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	Channel: payload.Channel,
+	ZipCode: payload.ZipCode,
+	Major: payload.Major,
+	Minor: payload.Minor,
+	BranchId: payload.BranchId
+}]]]></db:input-parameters>
+		</db:select>
+		<logger level="INFO" doc:name="Logger" doc:id="ca6fd9be-9ba8-4444-a2ed-d9c8f0d3b85f" message="#[payload]" />
+		<choice doc:name="Choice" doc:id="37ccfd6b-5803-43ce-a426-3bb9660e7b0b" >
+			<when expression="#[payload != null and sizeOf(payload) &gt; 0]">
+				<ee:transform doc:name="constructResponse" doc:id="30309c37-324d-45fd-aec2-0aa8c4d96c2a">
+
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+ {
+  "channel": payload[0].channel,
+  "zip": payload[0].Zip,
+  "major": payload[0].Major,
+  "minor?": payload[0].Minor,
+  "minorDescription?": payload[0].'Minor Description',
+  "state": payload[0].State,
+  "regionOrgNumber": payload[0].'Region Orgnbr',
+  "region": payload[0].Region,
+  "branchOrgNumber": payload[0].'Branch Orgnbr',
+  "branch": payload[0].Branch,
+  "calcSched": payload[0].'Calc Sched',
+  "calcSchedName?": payload[0].'Calc Sched Name',
+  "tier": payload[0].Tier,
+  "beginBalance": payload[0].'Begin Balance',
+  "endBalance": payload[0].'End Balance',
+  "rate": payload[0].Rate,
+  "effdate": payload[0].Effdate,
+  "inactivedate": payload[0].Inactivedate,
+  "myrank": payload[0].Myrank
+  }]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Log payload" doc:id="c75dec45-b5f1-478c-ac04-209f066ca1af" message="#[payload]" />
+			
+</when>
+			<otherwise >
+				<ee:transform doc:name="Error Response" doc:id="5158a8f7-d663-441f-8cf8-f9c575f575eb" >
+
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Error",
+	description: "The input parameters are not correct/interest-rates are missing."
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+	<sub-flow name="get-user-authentication"
+		doc:id="18b336d7-a91c-46e4-ae13-3e310cea991a">
+		<fiserv-auth:get-user-authentication
+			doc:name="Get user authentication"
+			doc:id="da75d23a-5592-48d3-9bbf-61c40b133f8a"
+			config-ref="fiservAuthenticationConfig"
+			applicationId="${fiserv.safProdInteg.applicationId}"
+			networkNodeName="${fiserv.safProdInteg.networkNodeName}" />
+	</sub-flow>
+	<sub-flow name="get-major-type" doc:id="b8854131-1e48-4996-9354-8ba12c518cc9" >
+		<db:select doc:name="Get Product Details" doc:id="d1380d93-9e1a-4368-a1f5-1ee89225b9bc" config-ref="Fiserv_Database_Config" target="productDetails" >
+			<db:sql ><![CDATA[select product_code, major_type_code, product_type, product from dynamic_product_listing where product_code = :product_code]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'product_code': vars.productName}]]]></db:input-parameters>
+		</db:select>
+	</sub-flow>
+	<flow name="ach-failure-processing" doc:id="55997708-fd81-49fa-9498-16044cf78ae1" >
+
+		<scheduler doc:name="Scheduler" doc:id="e98433b2-1930-40e6-9011-0dc71f354039" >
+			<scheduling-strategy >
+				<cron expression="${schedularInterval}" />
+			</scheduling-strategy>
+		</scheduler>
+		<logger level="INFO" doc:name="Start Log" doc:id="92ba62f2-d05e-4d7b-85de-99613216d43d" message="ACH Reprocessing started" />
+		<db:select doc:name="Read unprocessed failed records" doc:id="84988a6b-9a46-4bb2-8013-1dfdedcc1c66" config-ref="CoreDB_Database_Config">
+			<db:sql ><![CDATA[Select Account_number, From_account_number, Request, Error_message, Status, Request_date, Last_processed_date from ACHFailedRequests where Status = 'Pending' and Request_date > :requestDate ]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	requestDate: (now() - |P2D|) as String {format: "y-MM-dd"}
+}]]]></db:input-parameters>
+		</db:select>
+		<foreach doc:name="For Each" doc:id="444a219e-b60e-4bc9-abbe-b9f1b686fe0a" >
+			<ee:transform doc:name="Set Variables" doc:id="d9776d47-1aa4-4266-ac21-a056f5897676" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+read(payload.Request, "application/json")]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="errorMessage" ><![CDATA[%dw 2.0
+output application/json
+---
+payload.Error_message]]></ee:set-variable>
+					<ee:set-variable variableName="accountNumber" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.Account_number]]></ee:set-variable>
+				
+</ee:variables>
+			</ee:transform>
+			<try doc:name="Try" doc:id="8f2e4f5b-bbc9-4c24-9be2-2cb11f353e77" >
+				<until-successful maxRetries="3" doc:name="Until Successful" doc:id="b4242b5f-4add-43a3-bc5b-1fa82d59537e" millisBetweenRetries="${achRetryInterval}">
+			<flow-ref doc:name="ach-transfer-funds" doc:id="bc1f67fc-727d-4f45-a3d1-d9c1a0ce239e" name="ach-transfer-funds" />
+		</until-successful>
+				<logger level="INFO" doc:name="Log Success" doc:id="fe132ad9-cc9b-4a8c-abfd-de9574881c08" message="allotment success and updating Transaction status" />
+				<db:update doc:name="Update" doc:id="fba24c39-f31d-4458-93c5-f4ef14743c70" config-ref="CoreDB_Database_Config">
+							<db:sql><![CDATA[Update ACHFailedRequests set Status = 'Processed' where Account_number = :accountNumber]]></db:sql>
+							<db:input-parameters><![CDATA[#[{'accountNumber': vars.accountNumber}]]]></db:input-parameters>
+						</db:update>
+				<logger level="INFO" doc:name="Log Success" doc:id="daaa08bd-ddb2-42ef-bb18-1df3096b2a48" message="allotment success and Transaction status updated" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="175678c2-0e53-46e8-a421-5de72d528687">
+				<logger level="INFO" doc:name="Log Request" doc:id="bef16d28-e750-41dd-b1f6-f257d200fa2e" message="#['Reprocessing failed for: ' ++ vars.accountNumber]" />
+						<until-successful maxRetries="3" doc:name="Until Successful" doc:id="22c426a4-e919-479c-927d-277962bb9df3" millisBetweenRetries="5000">
+							<db:update doc:name="Update-Failed-Transactions" doc:id="9e540c08-b03a-43f2-a094-5f1c7e1de95e" config-ref="CoreDB_Database_Config">
+							<db:sql><![CDATA[Update ACHFailedRequests set Status = 'Failed' where Account_number = :accountNumber]]></db:sql>
+							<db:input-parameters><![CDATA[#[{'accountNumber': vars.accountNumber}]]]></db:input-parameters>
+						</db:update>
+						</until-successful>
+			</on-error-continue>
+				</error-handler>
+			</try>
+		</foreach>
+		<logger level="INFO" doc:name="Logger" doc:id="ff5892a4-1496-4410-9a80-fcf423dea3d9" message="ACH Reprocessing completed"/>
+		
+	</flow>
+	<flow name="generate-ACH-failed-report" doc:id="0ced896e-a597-4e09-897b-afc5b49fd6f3" >
+	<scheduler doc:name="Scheduler" doc:id="5ef2fe8e-47ef-43ed-b6f7-1245d4f3a9e5" >
+			<scheduling-strategy >
+				<cron expression="${Failureschedular}" />
+			</scheduling-strategy>
+		</scheduler>
+		<logger level="INFO" doc:name="Start Log" doc:id="b5e75ee8-4306-4dc4-89bd-de3bb641c690" message="Failed Report Flow Started"/>
+		<db:select doc:name="Read unprocessed failed records" doc:id="5b01fd4f-af71-4fdc-a4d4-b3c6ac3ac560" config-ref="CoreDB_Database_Config">
+			<db:sql><![CDATA[Select Account_number, From_account_number, Error_message, Request, Status, Request_date, Last_processed_date from ACHFailedRequests where Status = 'Failed' and Request_date > :requestDate ]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	requestDate: (now() - |P1D|) as String {format: "y-MM-dd"}
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Add to failures" doc:id="63366c45-3e8e-4ed7-9b76-57edaeaadd5c">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="reprocessFailures"><![CDATA[%dw 2.0
+output application/json
+---
+payload map ((item, index) ->{
+    "AccountNumber": item.Account_number,
+    "ApplicationId": read(item.Request, "application/json").addlDesc,
+    "ExternalAccountNumber": read(item.Request, "application/json").extAcctNbr,
+    "ExternalAccountName": read(item.Request, "application/json").extAcctName,
+    "RoutingNumber": read(item.Request, "application/json").recvRouteNbr,
+    "Amount": read(item.Request, "application/json").fixedAmt,
+    "Status": "Failed",
+    "ErrorMessage": item.Error_message,
+} )]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="f446faeb-0a4e-41f9-bd2e-82b4ce527b03" >
+			<when expression="#[sizeOf(vars.reprocessFailures) &gt; 0]">
+				<logger level="INFO" doc:name="Log Failures" doc:id="7b96e9d3-bee6-4d49-b1c5-c6b7411dca7b" message="Failed Transactions Available"/>
+				<ee:transform doc:name="Construct file" doc:id="1f339e01-ca37-41b4-9401-79f5d7994fc4">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/xlsx header=true
+---
+{
+  "ACH Errors": vars.reprocessFailures map ((item, index) -> {
+    "Application Id": item.ApplicationId,
+  	"TFCU Account Number": item.AccountNumber,
+  	"External Account Number": item.ExternalAccountNumber,
+  	"External Account Name": item.ExternalAccountName,
+    "Routing Number": item.RoutingNumber,
+    "Transaction Amount": item.Amount,
+    "Final Status": item.Status,
+    "Error Message": item.ErrorMessage
+})
+}]]></ee:set-payload>
+			</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="fileName"><![CDATA[%dw 2.0
+output application/json
+---
+'ACH_Failure_Report_' ++ now() as String {format: "uuuu-MM-dd"} ++ '.xlsx']]></ee:set-variable>
+					</ee:variables>
+		</ee:transform>
+				<logger level="INFO" doc:name="Log send email" doc:id="c8f2debf-9aab-4cae-8f4d-14d160b267f6" message="Sending Failure Email" />
+				<email:send doc:id="53752ee1-21bd-458a-a235-b9fed80ba466" toAddresses="#[p('email.addressesEmailNotifications') splitBy ',']" fromAddress="send_coreapps@teachersfcu.org" subject="#['New Account Funding - Failed ACH Funding Report - ' ++  p('mule.env') ++ ' ' ++ now() as String {format: 'uuuu-MM-dd'}]" doc:name="Email failure" config-ref="Email_SMTP_EmailNotificaitions">
+					<email:body>
+						<email:content><![CDATA[Hello,
+
+Please find attached the Failed ACH Funding Transactions Report for funding requests processed through the Digital Account Opening platform.
+In case of any questions please reach out to 'dao_development@teachersfcu.org' for assistance.
+
+
+Please Note: This email originated from an automated process. Please do not reply to this email, as the mailbox cannot accept incoming emails.]]></email:content>
+					</email:body>
+					<email:attachments><![CDATA[#[{
+	(vars.fileName): payload
+}]]]></email:attachments>
+				</email:send>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Log no failures" doc:id="624356a4-0835-4053-b50a-1777c11ef240" message="all failed allotment transactons are Reprocessed successfully"/>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="End Log" doc:id="54590be1-a0a1-4cea-8593-f3e494d938ef" message="Failed Report Flow Ended" />
+	</flow>
+	</mule>

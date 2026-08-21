@@ -1,0 +1,22 @@
+#%RAML 1.0 DataType
+
+displayName: Create Account Response
+description: Create Account Response structure
+type: object
+properties:
+  personNumber: integer
+  requestNumber?: integer
+  requestTypeCode: integer
+  wasSuccessful: boolean
+  accountGroupNumber?: string
+  accountNumber: integer
+  majorTypeCode: string
+  minorTypeCode: string
+  errors?: 
+    type: array
+    items:
+      type: !include error.raml
+  userAuthentication: !include user-authentication.raml
+
+examples:
+  createAccountResponse: !include ../examples/create-account-response-example.raml

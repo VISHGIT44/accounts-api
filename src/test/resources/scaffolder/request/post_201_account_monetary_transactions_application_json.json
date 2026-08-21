@@ -1,0 +1,24 @@
+{
+  "toAccount": {
+    "accountNumber": 6010612728,
+    "fund": {
+      "clearingCategoryCode": "IMED",
+      "fundAmount": "1.00",
+      "fundTypeCode": "EL",
+      "fundTypeDetailCode": "INTR"
+    },
+    "transactionAmount": "1.00",
+    "transactionTypeCode": "DEP"
+  },
+  "fromAccount": {
+    "accountNumber": 6007565972,
+    "fund": {
+      "clearingCategoryCode": "IMED",
+      "fundAmount": "-1.00",
+      "fundTypeCode": "EL",
+      "fundTypeDetailCode": "INTR"
+    },
+    "transactionAmount": "1.00",
+    "transactionTypeCode": "GLD"
+  }
+}

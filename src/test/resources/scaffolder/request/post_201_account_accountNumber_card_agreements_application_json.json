@@ -1,0 +1,20 @@
+{
+  "typeCode": "",
+  "agreementNumber": 0,
+  "details": [
+    {
+      "detailTypeCode": "",
+      "value": ""
+    }
+  ],
+  "organization": {
+    "OrganizationMemberNumber": 0,
+    "OrganizationNumber": 0,
+    "OrganizationTaxId": ""
+  },
+  "person": {
+    "personMemberNumber": 0,
+    "personNumber": 0,
+    "personTaxId": ""
+  }
+}

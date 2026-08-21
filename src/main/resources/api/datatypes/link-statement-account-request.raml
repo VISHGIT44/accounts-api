@@ -1,0 +1,14 @@
+#%RAML 1.0 DataType
+
+type: object
+properties:
+  entityNumber?: string
+  entityTypeCode?: string
+  statementAccountNumber?: string
+  statementAccounts?:
+      type: array
+      items: 
+        type: object
+        properties:
+          accountNumber?: string
+  

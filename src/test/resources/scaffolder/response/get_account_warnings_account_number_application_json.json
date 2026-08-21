@@ -1,0 +1,17 @@
+{
+    "requestTypeCode": 7735,
+    "wasSuccessful": true,
+    "accountWarnings": [
+        {
+            "accountNumber": "6003436359",
+            "effectiveDate": "2022-09-16T00:00:00",
+            "warningFlagCode": "1099",
+            "warningFlagDescription": "1099C Settled Account"
+        }
+    ],
+    "userAuthentication": [
+        {
+            "wasSuccessful": true
+        }
+    ]
+}

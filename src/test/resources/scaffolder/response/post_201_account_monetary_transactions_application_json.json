@@ -1,0 +1,41 @@
+{
+  "monetaryTransactionResponse": [
+    {
+      "requestNumber": "1",
+      "requestTypeCode": "7754",
+      "wasSuccessful": "true",
+      "accountNumber": "6010612728",
+      "cashBoxNumber": "2607",
+      "currentRtxnStatusCode": "C",
+      "newAvailable": "0",
+      "newLedgerBalance": "1",
+      "rtxnNumber": "2500",
+      "checkIssues": [
+        {
+          
+        }
+      ]
+    },
+    {
+      "requestNumber": "2",
+      "requestTypeCode": "7754",
+      "wasSuccessful": "true",
+      "accountNumber": "6007565972",
+      "cashBoxNumber": "2607",
+      "currentRtxnStatusCode": "C",
+      "newAvailable": "17372",
+      "newLedgerBalance": "17372",
+      "rtxnNumber": "19393",
+      "checkIssues": [
+        {
+          
+        }
+      ]
+    }
+  ],
+  "userAuthentication": [
+    {
+      "wasSuccessful": true
+    }
+  ]
+}

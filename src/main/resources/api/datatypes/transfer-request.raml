@@ -1,0 +1,19 @@
+#%RAML 1.0 DataType
+
+displayName: Transfer Request
+description: Create transfer request structure
+type: object
+properties:
+  effectiveDate?: string
+  fromAccountNumber: integer
+  fromDescription: string
+  isRegD?: boolean
+  rtxnSourceCode?: string
+  toAccountNumber: integer
+  toDescription: string
+  traceNumber?: string
+  transactionAmount: number
+  transferType: integer
+
+examples:
+  transferRequest: !include ../examples/transfer-request-example.raml

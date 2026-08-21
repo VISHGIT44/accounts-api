@@ -1,0 +1,28 @@
+#%RAML 1.0 DataType
+
+displayName: Transfer Request
+description: Create transfer request structure
+type: object
+additionalProperties: false
+properties:
+  allotNbr?: string
+  achRecvAcctTypCd?: string
+  achRecvTypCd?: string
+  balCatCd?: string
+  balTypCd?: string
+  rtxnTypCd?: string
+  allotTypCd?: string
+  effDate?: string
+  initialDueDate?: string
+  endDate?: string
+  fixedAmt?: number
+  achOrigYN?: string
+  ACHSameDaySettlementYN?: string
+  extAcctName?: string
+  recvRouteNbr?: string
+  extAcctNbr?: string
+  addlDesc?: string
+  toAccountNumber?: string
+
+examples:
+  transferRequest: !include ../examples/ach-transfer-request-example.raml

@@ -1,0 +1,30 @@
+<body>
+	<SubmitRequestResponse
+		xmlns="http://www.opensolutions.com/CoreApi">
+		<SubmitRequestResult
+			xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+			<Output>
+				<ExtensionResponses
+					xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"
+					i:nil="true" />
+				<Responses>
+					<ResponseBase
+						i:type="AccountWarningMaintenanceResponse">
+						<Errors></Errors>
+						<RequestNumber />
+						<RequestTypeCode>7736</RequestTypeCode>
+						<WasSuccessful>true</WasSuccessful>
+						<AccountWarnings
+							xmlns:a="http://schemas.datacontract.org/2004/07/OpenSolutions.CoreApiService.Services.Messages"
+							i:nil="true" />
+					</ResponseBase>
+				</Responses>
+				<UserAuthentication>
+					<Errors i:nil="true" />
+					<PersNbr>814204</PersNbr>
+					<WasSuccessful>true</WasSuccessful>
+				</UserAuthentication>
+			</Output>
+		</SubmitRequestResult>
+	</SubmitRequestResponse>
+</body>

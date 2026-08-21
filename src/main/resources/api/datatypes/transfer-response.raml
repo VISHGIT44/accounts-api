@@ -1,0 +1,27 @@
+#%RAML 1.0 DataType
+
+displayName: Transfer Response
+description: Create transfer response structure
+type: object
+properties:
+  requestNumber?: integer
+  requestTypeCode: integer
+  wasSuccessful: boolean
+  transferResponse:
+    properties:
+      fromAccountNumber: string
+      fromRtxnNbr: string
+      toAccountNumber: string
+      toRtxnNbr: string
+      transactionAmount: number
+      transactionDate: string
+      transactionReferenceNbr: string
+      transferValue: string
+  errors?: 
+    type: array
+    items:
+      type: !include error.raml
+  userAuthentication: !include user-authentication.raml
+
+examples:
+  transferResponse: !include ../examples/transfer-response-example.raml

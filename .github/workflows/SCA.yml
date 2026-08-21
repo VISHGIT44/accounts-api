@@ -1,0 +1,83 @@
+name: SCA_Scan
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+      - release
+      - develop
+
+      
+  workflow_dispatch:
+
+env:
+  NEXUS_USERNAME: ${{ secrets.NEXUSUSERNAME }}
+  NEXUS_PASSWORD: ${{ secrets.NEXUSPASSWORD }}
+  PLATFORM_USERNAME: ${{ secrets.PLATFORMUSERNAME }}
+  PLATFORM_PASSWORD: ${{ secrets.PLATFORMPASSWORD }}
+  ENVIRONMENT: ${{ secrets.ENVIRONMENT}}  
+    
+jobs:
+  test:
+    runs-on: self-hosted
+   
+    steps:
+    - name: Checkout this repo
+      uses: actions/checkout@v4
+
+    - name: Check JDK version
+      run: java --version
+
+    - name: Check Maven version
+      run: mvn --version    
+
+    - name: Current working directory
+      run: pwd
+
+    - name: Extract repository name
+      shell: pwsh
+      run: |
+        $fullRepo = "${{ github.repository }}"
+        $repoName = $fullRepo.Split('/')[-1]
+        
+        $ref = $env:GITHUB_REF
+        $branchName = $ref.Split('/')[-1]
+
+        $appID = "$repoName-$branchName"
+        Add-Content -Path $env:GITHUB_ENV -Value "APP_ID=$appID"
+
+    - name: Build with Maven
+      run: mvn -B clean package -s .maven/settings.xml "-Dmule.env=dev" "-Dmule.key=${{ secrets.MuleKEY }}"
+  
+    # Make Sonatype CLI available to GitHub runners
+    - name: Setup Sonatype CLI
+      uses: sonatype/actions/setup-iq-cli@v1
+      with:
+        iq-cli-version: 1.179.0-01
+
+    # Run Sonatype CLI
+    - name: Run Sonatype CLI
+      id: evaluate
+      uses: sonatype/actions/run-iq-cli@v1
+      with:
+        iq-server-url: https://sona-ext.teachersfcu.org
+        username: ${{ secrets.LIFECYCLE_USERNAME }}
+        password: ${{ secrets.LIFECYCLE_PASSWORD }}
+        application-id: ${{env.APP_ID}}
+        scan-targets: target/* 
+
+      # Fetch the SBOM file associated with the evaluation
+    - name: Fetch SBOM
+      uses: sonatype/actions/fetch-sbom@v1
+      if: ( success() || failure() ) && steps.evaluate.outputs.scan-id 
+      with:
+          iq-server-url: https://sona-ext.teachersfcu.org
+          username: ${{ secrets.LIFECYCLE_USERNAME }}
+          password: ${{ secrets.LIFECYCLE_PASSWORD }}
+          application-id: ${{ env.APP_ID }}
+          scan-id: ${{ steps.evaluate.outputs.scan-id }}
+          sbom-standard: cyclonedx
+          sbom-version: 1.5
+          sbom-format: json
+          artifact-name: sbom-cyclonedx

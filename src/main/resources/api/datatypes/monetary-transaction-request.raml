@@ -1,0 +1,36 @@
+#%RAML 1.0 DataType
+
+displayName: Create Monetary Transaction Request
+description: Create Monetary Transaction Request
+type: object
+properties:
+    toAccount: 
+      type: object
+      properties:
+        accountNumber: number
+        fund:
+          type: object
+          properties:
+            clearingCategoryCode: string
+            fundAmount: string
+            fundTypeCode: string
+            fundTypeDetailCode: string
+            numberOfItems?: integer
+        transactionAmount: string
+        transactionTypeCode: string
+    fromAccount: 
+      type: object
+      properties:
+        accountNumber: number
+        fund:
+          type: object
+          properties:
+            clearingCategoryCode: string
+            fundAmount: string
+            fundTypeCode: string
+            fundTypeDetailCode: string
+            numberOfItems?: integer
+        transactionAmount: string
+        transactionTypeCode: string
+
+

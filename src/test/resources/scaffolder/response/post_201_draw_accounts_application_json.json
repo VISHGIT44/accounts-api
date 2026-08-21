@@ -1,0 +1,11 @@
+{
+    "requestTypeCode": 7705,
+    "wasSuccessful": true,
+    "entityNumber": "373486",
+    "entityTypeCode": "PERS",
+    "userAuthentication": [
+        {
+            "wasSuccessful": true
+        }
+    ]
+}

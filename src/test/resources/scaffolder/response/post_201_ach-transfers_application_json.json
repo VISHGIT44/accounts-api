@@ -1,0 +1,21 @@
+{
+	"requestTypeCode": 7753,
+	"wasSuccessful": true,
+	"transferResponse": [
+		{
+			"fromAccountNumber": "12610002394965",
+			"fromRtxnNbr": "5363",
+			"toAccountNumber": "6006785240",
+			"toRtxnNbr": "2505",
+			"transactionAmount": 0.01,
+			"transactionDate": "2020-05-21T00:00:00",
+			"transactionReferenceNbr": "6006785240-2505",
+			"transferValue": "6006785240-2505  21-MAY-20  .01"
+		}
+	],
+	"userAuthentication": [
+		{
+			"wasSuccessful": true
+		}
+	]
+}

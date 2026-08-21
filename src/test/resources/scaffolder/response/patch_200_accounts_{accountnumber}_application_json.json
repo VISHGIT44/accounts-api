@@ -1,0 +1,25 @@
+{
+  "requestNumber": "",
+  "requestTypeCode": 0,
+  "WasSuccessful": false,
+  "accountResponse": {
+    "accountNumber": "",
+    "major": "",
+    "newMinor": "",
+    "oldMinor": "",
+    "wasSuccessful": false
+  },
+  "errors": [
+    {
+      "errorMessage": "",
+      "errorNumber": "",
+      "oraErrorMessage": "",
+      "rtxnExceptionMessage": "",
+      "rtxnExceptionNumber": ""
+    }
+  ],
+  "userAuthentication": {
+    "errors": "",
+    "wasSuccessful": false
+  }
+}

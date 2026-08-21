@@ -1,0 +1,24 @@
+#%RAML 1.0 NamedExample
+
+  bankOrganizationNumber: 1
+  branchOrganizationNumber: 1
+  currentMinorAccountTypeCode: "PSHR"
+  majorAccountTypeCode: "SAV"
+  ownershipCode: "S"
+  deliveryMethodCode: "ESTM"
+  mailAddressUseCode: "ALT"
+  isShareStatement: true
+  currentAccountStatusCode: "ACT"
+  persons:
+    - personNumber: 123456
+      name:
+        firstName: "Peter"
+        lastName: "Wood"
+      isCreateMember: true
+      memberGroupCode: "MBR"
+      isTaxReportedForOwner: true
+      isTaxReportedForSigner: true
+      accountRoles:
+        - accountRoleCode: "OWN"
+          accountRoleDescription: "test role"
+      

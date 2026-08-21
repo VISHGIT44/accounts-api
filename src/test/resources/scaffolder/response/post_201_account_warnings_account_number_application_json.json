@@ -1,0 +1,17 @@
+{
+    "requestTypeCode": 7736,
+    "wasSuccessful": false,
+    "accountWarningResponse": null,
+    "errors": [
+        {
+            "errorMessage": "Invalid ProcessType",
+            "errorNumber": 100001,
+            "oraErrorMessage": null
+        }
+    ],
+    "userAuthentication": [
+        {
+            "wasSuccessful": true
+        }
+    ]
+}

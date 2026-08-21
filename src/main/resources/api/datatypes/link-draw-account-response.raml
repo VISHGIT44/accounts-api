@@ -1,0 +1,18 @@
+#%RAML 1.0 DataType
+
+type: object
+properties:
+  requestNumber?: string
+  requestTypeCode: integer
+  WasSuccessful: boolean
+  accountResponse:
+    type: object
+    properties:
+      entityNumber?: string
+      entityTypeCode?: string
+      wasSuccessful: boolean
+  errors?: 
+    type: array
+    items:
+      type: !include error.raml
+  userAuthentication: !include user-authentication.raml

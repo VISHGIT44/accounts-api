@@ -1,0 +1,20 @@
+{
+    "allotNbr": "",
+    "achRecvAcctTypCd": "SAV",
+    "achRecvTypCd": "PERS",
+    "balCatCd": "NOTE",
+    "balTypCd": "BAL",
+    "rtxnTypCd": "XDEP",
+    "allotTypCd": "ONCE",
+    "effDate": "10/03/2023",
+    "initialDueDate": "10/03/2023",
+    "endDate": "",
+    "fixedAmt": 54,
+    "achOrigYN": "Y",
+    "ACHSameDaySettlementYN": "N",
+    "extAcctName": "Alberta Bobbeth Charleson",
+    "recvRouteNbr": "011401533",
+    "extAcctNbr": "1111222233331111",
+    "addlDesc": "XYYYY89",
+    "toAccountNumber": "6010673578"
+}

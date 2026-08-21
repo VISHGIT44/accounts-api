@@ -1,0 +1,17 @@
+{
+    "requestTypeCode": 7719,
+    "wasSuccessful": false,
+    "accounts": null,
+    "errors": [
+        {
+            "errorMessage": "Invalid Value in the Major Minor Account Type",
+            "errorNumber": 10001,
+            "oraErrorMessage": null
+        }
+    ],
+    "userAuthentication": [
+        {
+            "wasSuccessful": true
+        }
+    ]
+}

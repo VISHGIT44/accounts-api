@@ -1,0 +1,27 @@
+#%RAML 1.0 DataType
+
+displayName: Create Card Agreement Request
+description: Create Card Agreement Request
+type: object
+properties:
+    typeCode: string
+    agreementNumber?: number
+    details?:
+      type: array
+      items:
+        type: object
+        properties:
+          detailTypeCode?: string
+          value?: string
+    organization?:
+      type: object
+      properties:
+        OrganizationMemberNumber?: number
+        OrganizationNumber?: number
+        OrganizationTaxId?: string
+    person?: 
+      type: object
+      properties:
+        personMemberNumber?: number
+        personNumber?: number
+        personTaxId?: string
